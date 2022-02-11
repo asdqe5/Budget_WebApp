@@ -1,0 +1,122 @@
+{{define "help-toolbar"}}
+<!-- Navbar Help -->
+<div class="p-5">
+    <h3 class="pt-2 pb-4 text-darkmode text-center">Toolbar</h3>
+    <div class="row">
+        <div class="mx-auto">
+            <div class="">
+                <nav class="navbar navbar-expand-lg navbar-darkmode">
+                    <div>
+                    <ul class="navbar-nav">
+                        <span class="navbar-brand finger" title="홈으로 이동합니다.">BUDGET</span>
+                        <!-- Timelog 메뉴 -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Timelog
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <span class="dropdown-item finger" title="VFX 월별 타임로그">VFX</span>
+                                <span class="dropdown-item finger" title="CM 월별 타임로그">CM</span>
+                                <span class="dropdown-item finger" title="연간 월별 누적 타임로그">Total</span>
+                            </div>
+                        </li>
+                        <!-- 결산 메뉴 -->
+                        {{if ge .Token.AccessLevel 2}}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    결산
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                    <span class="dropdown-item finger" title="연간 월별 프로젝트 매출 현황">매출 현황</span>
+                                    <span class="dropdown-item finger" title="연간 원별 벤더 외주비 현황">외주 현황</span>
+                                    <span class="dropdown-item finger" title="연간 월별 매출, 외주비 현황">Total 현황</span>
+                                    {{if eq $.Token.AccessLevel 4}}
+                                        <span class="dropdown-divider"></span>
+                                        <span class="dropdown-item finger" title="월별 아티스트별 세부 인건비 현황">세부 인건비</span>
+                                        <span class="dropdown-item finger" title="연간 프로젝트별 Total 인건비 현황">Total 인건비</span>
+                                    {{end}}
+                                </div>
+                            </li>
+                        {{end}}
+                        <!-- 예산 navbar 정보 추후에 넣기
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                예산
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <span class="dropdown-item finger" title="">Total</span>
+                                <span class="dropdown-item finger" title="">실행 예산</span>
+                                <span class="dropdown-item finger" title="">BID</span>
+                                <span class="dropdown-item finger" title="">Setting</span>
+                            </div>
+                        </li> -->
+                        <!-- user 메뉴 -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                {{.Token.ID}}
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <span class="dropdown-item finger" title="개인 정보를 확인합니다.">Profile</span>
+                                <span class="dropdown-item finger" title="로그아웃 합니다.">Sign Out</span>
+                            </div>
+                        </li>
+                        <!-- admin 메뉴 -->
+                        {{if ge .Token.AccessLevel 2}}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-danger" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Admin
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                {{if eq .Token.AccessLevel 4}}
+                                    <span class="dropdown-item finger" title="유저를 관리합니다.">Users</span>
+                                    <span class="dropdown-item finger" title="VFX 아티스트를 관리합니다.">Artist_VFX</span>
+                                    <span class="dropdown-item finger" title="CM 아티스트를 관리합니다.">Artist_CM</span>
+                                    <span class="dropdown-item finger" title="월별 프로젝트에 대한 슈퍼바이저의 타임로그를 관리합니다.">Timelogs_SUP</span>
+                                {{end}}
+                                <span class="dropdown-item finger" title="결산 프로젝트를 관리합니다.">Projects_결산</span>
+                                <span class="dropdown-item finger" title="외주 업체를 관리합니다.">Vendors</span>
+                                {{if eq .Token.AccessLevel 4}}
+                                    <span class="dropdown-item finger" title="Admin Setting 정보를 관리합니다.">Admin Setting</span>
+                                {{end}}
+                            </div>
+                        </li>
+                        {{end}}
+                        <!-- help 메뉴 -->
+                        <li class="nav-item">
+                            <span class="nav-link finger" title="도움말을 확인합니다.">Help</span>
+                        </li>
+                        <!-- log 메뉴 -->
+                        {{if ge .Token.AccessLevel 2}}
+                            <li class="nav-item">
+                                <span class="nav-link finger" title="로그를 확인합니다.">Log</span>
+                            </li>
+                        {{end}}
+                    </ul>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="mx-auto text-center">
+            <div class="text-left text-darkmode pt-4 help-text">
+                메뉴를 클릭하고 마우스를 올리면 간단한 설명을 볼 수 있습니다.<br>
+                <br>
+                • Timelog : 타임로그 정보를 업데이트하고 확인할 수 있습니다.<br>
+                {{if ge .Token.AccessLevel 2}}
+                • 결산 : 프로젝트 결산 관련 정보를 확인할 수 있습니다.<br>
+                {{end}}
+                <!-- • 예산 : 예산 정보를 관리할 수 있습니다.<br> -->
+                • UserID : 프로필, 로그아웃<br>
+                {{if ge .Token.AccessLevel 2}}
+                • Admin : 관리자 옵션을 설정하고 유저, 아티스트, 프로젝트, 외주 업체를 관리할 수 있습니다.<br>
+                {{end}}
+                • Help : 도움말<br>
+                {{if ge .Token.AccessLevel 2}}
+                • Log : 로그<br>
+                {{end}}
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

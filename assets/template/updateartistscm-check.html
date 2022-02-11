@@ -1,0 +1,77 @@
+{{define "updateartistscm-check"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+
+    <div class="container py-4 px-2">
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pb-2">
+            <div class="pt-3 pb-3">
+                <h2 class="text-muted text-center">Update CM Artist</h2>
+            </div>
+            <div class="pt-3 pb-3">
+                <h6 class="text-muted text-center">
+                    <label style="font-size:20px;color:darkorange">&#9888;</label>
+                    Update 버튼을 클릭하면 아래와 같이 아티스트 정보가 리셋됩니다.
+                </h6>
+            </div>
+        </div>
+
+        <form action="/updateartistscm-submit" method="POST">
+            <div class="col-lg-12 col-md-8 col-sm-12 mx-auto">
+                <table class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th>CM ID</th>
+                            <th>부서</th>
+                            <th>팀</th>
+                            <th>이름</th>
+                            <th>입사일</th>
+                            <th>퇴사일</th>
+                            <th>연봉</th>
+                            <th>동일 연도 연봉 변경</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {{$artistNum := 0}}
+                        {{range $artist := .Artists}}
+                            <tr>
+                                <input type="hidden" id="id{{$artistNum}}" name="id{{$artistNum}}" value="{{$artist.ID}}">
+                                <input type="hidden" id="dept{{$artistNum}}" name="dept{{$artistNum}}" value="{{$artist.Dept}}">
+                                <input type="hidden" id="team{{$artistNum}}" name="team{{$artistNum}}" value="{{$artist.Team}}">
+                                <input type="hidden" id="name{{$artistNum}}" name="name{{$artistNum}}" value="{{$artist.Name}}">
+                                <input type="hidden" id="startday{{$artistNum}}" name="startday{{$artistNum}}" value="{{$artist.StartDay}}">
+                                <input type="hidden" id="endday{{$artistNum}}" name="endday{{$artistNum}}" value="{{$artist.EndDay}}">
+                                <input type="hidden" id="salary{{$artistNum}}" name="salary{{$artistNum}}" value="{{mapToStringFunc $artist.Salary}}">
+                                <input type="hidden" id="change{{$artistNum}}" name="change{{$artistNum}}" value="{{mapToStringFunc $artist.ChangedSalary}}">
+                                
+                                <td>{{$artist.ID}}</td>
+                                <td>{{$artist.Dept}}</td>
+                                <td>{{$artist.Team}}</td>
+                                <td>{{$artist.Name}}</td>
+                                <td>{{$artist.StartDay}}</td>
+                                <td>{{$artist.EndDay}}</td>
+                                <td>{{mapToStringFunc $artist.Salary}}</td>
+                                <td>{{mapToStringFunc $artist.ChangedSalary}}</td>
+                            </tr>
+                            {{$artistNum = addIntFunc $artistNum 1}}
+                        {{end}}
+                    </tbody>
+                </table>
+                <input type="hidden" id="artistNum" name="artistNum" value="{{$artistNum}}">
+
+                <div class="text-center pt-4 pb-4">
+                    <button type="submit" class="btn btn-outline-danger">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

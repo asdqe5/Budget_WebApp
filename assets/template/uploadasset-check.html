@@ -1,0 +1,93 @@
+{{define "uploadasset-check"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pb-2">
+            <div class="pt-3 pb-3">
+                <h2 class="text-muted text-center">Upload Asset</h2>
+            </div>
+            <div class="pt-3 pb-3">
+                <h6 class="text-muted text-center">
+                    <label style="font-size:20px;color:darkorange">&#9888;</label>
+                    Upload 버튼을 클릭하면 아래와 같이 <b style="color: darkgoldenrod">프로젝트 {{.ID}} {{.BGType}}</b>의 샷 정보가 업로드됩니다.
+                </h6>
+            </div>
+        </div>
+
+        <form action="/uploadasset-submit?id={{.ID}}&bgtype={{.BGType}}" method="POST">
+            <div class="mx-auto freeze-table">
+                <table class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th rowspan="2" class="border-top-white border-bottom-white border-right-gray">분류</th>
+                            <th rowspan="2" class="border-top-white border-bottom-white border-right-gray">명칭</th>
+                            <th rowspan="2" class="border-top-white border-bottom-white border-right-gray">VFX_note</th>
+                            <th rowspan="2" class="border-top-white border-bottom-white border-right-white">Shot</th>
+                            <th colspan="{{len .BGTaskList}}" class="border-top-white border-bottom-gray">Task</th>
+                        </tr>
+                        <tr>
+                            {{range $i, $task := .BGTaskList}}
+                                <th class="border-bottom-white {{if ne (addIntFunc $i 1) (len $.BGTaskList)}} border-right-gray {{end}}" style="min-width: 60px;">{{$task}}</th>
+                            {{end}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $n, $asset := .BGAssetList}}
+                            <tr>
+                                <td class="border-top-gray border-right-gray">{{$asset.Class}}</td>
+                                <td style="max-width: 100px; white-space: normal;" class="border-top-gray border-right-gray">{{$asset.Name}}</td>
+                                <td style="max-width: 120px; white-space: normal;" class="border-top-gray border-right-gray">{{$asset.Note}}</td>
+                                <td class="border-top-gray border-right-white">{{$asset.Shot}}</td>
+                                {{range $i, $task := $.BGTaskList}}
+                                    {{$bid := index $asset.Manday $task}}
+                                    {{if ne $bid 0.0}}
+                                        <td class="border-top-gray {{if ne (addIntFunc $i 1) (len $.BGTaskList)}} border-right-gray {{end}}">{{$bid}}</td>
+                                    {{else}}
+                                        <td class="border-top-gray {{if ne (addIntFunc $i 1) (len $.BGTaskList)}} border-right-gray {{end}}"></td>
+                                    {{end}}
+                                {{end}}
+                            </tr>
+                        {{end}}
+                        <tr>
+                            <td colspan="4" class="border-right-white total border-top-white">Total</td>
+                            {{range $i, $task := $.BGTaskList}}
+                                {{$tbid := index $.TotalBid $task}}
+                                {{if eq $tbid 0.0}}
+                                    <td class="border-top-white {{if ne (addIntFunc $i 1) (len $.BGTaskList)}} border-right-gray {{end}} total"></td>
+                                {{else}}
+                                    <td class="border-top-white {{if ne (addIntFunc $i 1) (len $.BGTaskList)}} border-right-gray {{end}} total">{{$tbid}}</td>
+                                {{end}}
+                            {{end}}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center pt-4 pb-4">
+                <button type="submit" class="btn btn-outline-danger">Upload</button>
+            </div>
+        </form>
+    </div>
+
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+</html>
+{{end}}

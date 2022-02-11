@@ -1,0 +1,126 @@
+{{define "bgprojects"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-bgproject" .}}
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <form action="/searchbgprojects" method="POST">
+            <div class="row justify-content-center align-items-center m-3">
+                <div class="col-lg-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <input type="month" class="form-control" name="date" value="{{.Date}}" max="9999-12">
+                        </div>
+                        <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="{{.SearchWord}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-darkmode" id="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportbgprojects" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    {{if ge .Token.AccessLevel 3}}
+                        <a href="/addbgproject" class="btn btn-outline-warning btn-sm">+</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+        <div class="mx-auto freeze-table">
+            <!-- 결산 테이블 -->
+            <table name="bgprojecttable" id="bgprojecttable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">Status</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">ID</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">이름</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">작업 예상 기간</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">총 매출</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">계약일</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="2">컷수 정보</th>
+                        <th class="border-top-white border-bottom-white {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}" rowspan="2">예산안 타입</th>
+                        {{if ge .Token.AccessLevel 3}}
+                            <th class="border-top-white border-bottom-white border-right-white" rowspan="2">팀세팅</th>
+                            <th class="border-top-white border-bottom-white" rowspan="2"></th>
+                        {{end}}
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">계약 컷수</th>
+                        <th class="border-bottom-white border-right-white">작업 컷수</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $bgproject := .BGProjects}}
+                        {{$typelen := len $bgproject.TypeList}}
+                        {{range $index, $bgtype := $bgproject.TypeList}}
+                            <tr>
+                                {{if eq $index 0}}
+                                    {{if eq $bgproject.Status true}}
+                                        <td class="border-top-gray border-right-gray" rowspan="{{$typelen}}">계약 완료</td>
+                                    {{else}}
+                                        <td class="border-top-gray border-right-gray" rowspan="{{$typelen}}">사전 검토</td>
+                                    {{end}}
+                                    <td class="border-top-gray border-right-gray" rowspan="{{$typelen}}">{{$bgproject.ID}}</td>
+                                    <td class="border-top-gray border-right-gray" rowspan="{{$typelen}}">{{$bgproject.Name}}</td>
+                                    <td class="border-top-gray border-right-white" rowspan="{{$typelen}}">{{stringToDateFunc $bgproject.StartDate}} ~ {{stringToDateFunc $bgproject.EndDate}}</td>
+                                {{end}}
+                                {{$bgtypedata := index $bgproject.TypeData $bgtype}}
+                                {{if eq $bgtypedata.Decision ""}}
+                                    <td class="border-top-gray border-right-white text-right" {{if eq $bgproject.MainType $bgtype}} style="background-color: #505050; font-weight: bold;" {{end}}>{{decryptCostFunc $bgtypedata.Proposal true}}</td>
+                                {{else}}
+                                    <td class="border-top-gray border-right-white text-right" {{if eq $bgproject.MainType $bgtype}} style="background-color: #505050; font-weight: bold;" {{end}}>{{decryptCostFunc $bgtypedata.Decision true}}</td>
+                                {{end}}
+                                <td class="border-top-gray border-right-white" {{if eq $bgproject.MainType $bgtype}} style="background-color: #505050; font-weight: bold;" {{end}}>{{stringToDateFunc $bgtypedata.ContractDate}}</td>
+                                <td class="border-top-gray border-right-gray" {{if eq $bgproject.MainType $bgtype}} style="background-color: #505050; font-weight: bold;" {{end}}>{{putCommaFunc $bgtypedata.ContractCuts}}</td>
+                                <td class="border-top-gray border-right-white" {{if eq $bgproject.MainType $bgtype}} style="background-color: #505050; font-weight: bold;" {{end}}>{{putCommaFunc $bgtypedata.WorkingCuts}}</td>
+                                <td class="border-top-gray {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}" {{if eq $bgproject.MainType $bgtype}} style="background-color: #505050; font-weight: bold;" {{end}}>{{$bgtype}}</td>
+                                {{if ge $.Token.AccessLevel 3}}
+                                    <td class="border-top-gray border-right-white">
+                                        <a class="finger badge badge-info" href="/bgproject-teamsetting?id={{$bgproject.ID}}&bgtype={{$bgtype}}&date={{$.Date}}">Setting</a>
+                                    </td>
+                                    {{if eq $index 0}}
+                                        <td rowspan="{{$typelen}}" class="border-top-gray">
+                                            <a class="finger badge badge-warning" href="/edit-bgproject?id={{$bgproject.ID}}&date={{$.Date}}">Edit</a>
+                                            {{if eq $.Token.AccessLevel 4}}
+                                                <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmbgproject" onclick="setRmBGProjectModalFunc('{{$bgproject.ID}}', '{{$bgproject.Name}}')">Del</span>
+                                            {{end}}
+                                        </td>
+                                    {{end}}
+                                {{end}}
+                            </tr>
+                        {{end}}
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+</html>
+{{end}}

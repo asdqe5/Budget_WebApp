@@ -1,0 +1,172 @@
+{{define "timelog-cm"}}
+{{template "head"}}
+<body onload="sortTableFunc('timelogTable', 1)">
+    {{template "navbar" .}}
+    {{template "modal-timelog" .}}
+
+    <div class="container py-4 px-2" style="max-width:80%">
+        <form action="/searchtimelog-cm" method="POST">
+            <div class="row justify-content-center align-items-center m-3">
+                <div class="col-lg-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <input type="month" class="form-control" name="date" value="{{.Date}}" max="9999-12">
+                            <select name="team" class="custom-select left-radius">
+                                <option value="" {{ if eq .SelectedTeam "" }}selected{{end}}>All</option>
+                                {{range $team := .Teams}}
+                                    <option value="{{$team}}" {{ if eq $.SelectedTeam $team }}selected{{end}}>{{$team}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="{{.SearchWord}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-darkmode" id="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exporttimelog-cm" method="POST">
+                        {{if ge .Token.AccessLevel 3}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    {{if ge .Token.AccessLevel 3}}
+                    <a class="btn btn-outline-danger btn-sm" href="/updatetimelog-cm?date={{.Date}}">+</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="mx-auto freeze-table">
+                <table class="table table-sm text-center table-hover text-white" id="timelogTable">
+                    <thead>
+                        <tr>
+                            <th class="border-right-gray border-bottom-white border-top-white finger" id="th0" onclick="sortTableFunc('timelogTable', 0)">ID</th>
+                            <th class="border-right-white border-bottom-white border-top-white finger table-header-sorted" id="th1" onclick="sortTableFunc('timelogTable', 1)">이름</th>
+                            {{$tmp := len .Projects}}
+                            {{range $n, $project := .Projects}}
+                                <th {{if eq $n (addIntFunc $tmp -1)}} class="border-bottom-white border-right-white border-top-white" {{else}} class="border-bottom-white border-right-gray border-top-white" {{end}}>{{$project}}</th>
+                            {{end}}
+                            <th class="border-bottom-white border-top-white total">Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {{range $artistID, $artistData := .ArtistDatas}}
+                            <tr>
+                                <td class="border-top-gray border-right-gray">{{$artistID}}</td>        <!-- 아티스트 ID -->
+                                <td class="border-top-gray border-right-white">{{$artistData.Name}}</td>  <!-- 아티스트 이름 -->
+                                {{$tmp := len $.Projects}}
+                                {{range $n, $project := $.Projects}}
+                                    <td {{if eq $n (addIntFunc $tmp -1)}} class="border-right-white border-top-gray" {{else}} class="border-right-gray border-top-gray" {{end}}>{{durationToTimeFunc (index $artistData.Timelogs $project)}}</td>   <!-- 타임로그 데이터 -->
+                                {{end}}
+                                <td class="border-top-gray total">{{durationToTimeFunc $artistData.TotalDuration}}</td><!-- 아티스트가 작성한 총 타임로그 시간 -->
+                            </tr>
+                        {{end}}
+                        <tr>
+                            <td class="border-top-white border-right-white total" colspan="2">Total</td>
+                            {{$tmp := len .Projects}}
+                            {{range $n, $project := .Projects}}
+                                <td {{if eq $n (addIntFunc $tmp -1)}} class="border-right-white border-top-white total" {{else}} class="border-right-gray border-top-white total" {{end}}>{{durationToTimeFunc (index $.ProjectDuration $project)}}</td>
+                            {{end}}
+                            <td class="border-top-white total">{{durationToTimeFunc .TotalDuration}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<!-- DB에 저장되지 않은 아티스트들 -->
+{{if .NoneArtists}}
+    {{if eq .Token.AccessLevel 4}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+            document.getElementById("modal-noneartists-btn").setAttribute("onclick", "self.location='artists-cm'")
+            $(window).on('load', function () {
+                $("#modal-noneartists").modal("show");
+            });
+        </script>
+    {{else}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+            $(window).on('load', function () {
+                $("#modal-noneartists").modal("show");
+            });
+        </script>
+    {{end}}
+{{end}}
+
+<!-- DB에 저장되지 않은 프로젝트들 -->
+{{if .NoneProjects}}
+    {{if ge .Token.AccessLevel 3}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneprojects-id").value = "{{listToStringFunc .NoneProjects false}}"
+            document.getElementById("modal-noneprojects-btn").setAttribute("onclick", "self.location='addproject'")
+            $(window).on('load', function () {
+                $("#modal-noneprojects").modal("show");
+            })
+        </script>
+    {{else}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneprojects-id").value = "{{listToStringFunc .NoneProjects false}}"
+            $(window).on('load', function () {
+                $("#modal-noneprojects").modal("show");
+            })
+        </script>
+    {{end}}
+{{end}}
+
+<!-- 작업기간에 이상이 있는 프로젝트들 -->
+{{if or (ne (len .StartDateErrProjects) 0) (ne (len .EndDateErrProjects) 0)}}
+    {{if ge .Token.AccessLevel 3}}
+        <script type="text/javascript">
+            document.getElementById("modal-errorstartdateprojects-id").value = "{{range $p := $.StartDateErrProjects}}{{$p.ID}} ({{$p.StartDate}} ~ {{$p.SMEndDate}})   {{end}}"
+            document.getElementById("modal-errorenddateprojects-id").value = "{{range $p := $.EndDateErrProjects}}{{$p.ID}} ({{$p.StartDate}} ~ {{$p.SMEndDate}})   {{end}}"
+            document.getElementById("modal-errordateprojects-btn").setAttribute("onclick", "self.location='projects?date={{.Date}}'")
+            $(window).on('load',function () {
+                $("#modal-errordateprojects").modal("show");
+            });
+        </script>
+    {{else}}
+        <script type="text/javascript">
+            document.getElementById("modal-errorstartdateprojects-id").value = "{{range $p := $.StartDateErrProjects}}{{$p.ID}} ({{$p.StartDate}} ~ {{$p.SMEndDate}}   {{end}})"
+            document.getElementById("modal-errorenddateprojects-id").value = "{{range $p := $.EndDateErrProjects}}{{$p.ID}} ({{$p.StartDate}} ~ {{$p.SMEndDate}})   {{end}}"
+            $(window).on('load',function () {
+                $("#modal-errordateprojects").modal("show");
+            });
+        </script>
+    {{end}}
+{{end}}
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

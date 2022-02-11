@@ -1,0 +1,206 @@
+{{define "detail-sm"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <!-- 프로젝트 기본 정보 -->
+    <div class="pt-5 pb-5">
+        <h3 class="text-center font-weight-bold section-heading text-muted">[ {{.Project.Name}} ]</h3>
+
+        <div class="row pt-4">
+            <div class="col">
+                <p class="text-right font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">{{stringToDateFunc .Project.StartDate}} ~ {{stringToDateFunc .Project.SMEndDate}} &nbsp;/&nbsp; 작업 컷수 : {{putCommaFunc .Project.WorkingCuts}} 컷</p>
+            </div>
+            <div class="col">
+                <p class="text-left font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">감독 : {{.Project.DirectorName}} &nbsp;/&nbsp; 제작사 : {{.Project.ProducerName}}</p>
+            </div>
+        </div>
+        <div class="row pt-2">
+            <div class="col">
+                <p class="text-right font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">총 매출 : {{decryptPaymentFunc .Project.Payment true}} 원</p>
+            </div>
+            <div class="col">
+                {{range $num, $payment := .Project.Payment}}
+                    <p class="text-left font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">계약 금액 : {{decryptCostFunc $payment.Expenses true}} 원 &nbsp;/&nbsp; 계약일 : {{stringToDateFunc $payment.Date}}</p>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <!-- 합계 테이블 -->
+    <div class="container py-4 px-2" style="max-width:80%">
+        <div class="mx-auto pb-5">
+            <table name="detailsumtable" id="detailsumtable" class="table table-sm text-center table-hover text-white" style="table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="3">매출</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="5">총 지출</th>
+                        <th class="border-top-white border-bottom-white" rowspan="3">수익</th>
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-gray border-right-gray" colspan="2">내부 인건비</th>
+                        <th class="border-bottom-white border-right-gray" rowspan="2">진행비 + 구매비</th>
+                        <th class="border-bottom-white border-right-gray" rowspan="2">외주비</th>
+                        <th class="border-bottom-white border-right-white" rowspan="2">합계</th>
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">VFX</th>
+                        <th class="border-bottom-white">CM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-size: large;" class="border-bottom-white border-right-white text-right">{{decryptCostFunc .CostSum.Payment true}}</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">{{decryptCostFunc .CostSum.VFX true}}</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">{{decryptCostFunc .CostSum.CM true}}</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">{{decryptCostFunc .CostSum.ProPur true}}</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">
+                            {{decryptCostFunc .CostSum.Vendor true}}
+                            <!-- 외주비 - 세부 사항 -->
+                            <span class="dropright">
+                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <table class="dropdown-header text-center text-white">
+                                        <thead>
+                                            <tr>
+                                                <th class="border-top-white border-right-white border-bottom-white">업체명</th>
+                                                <th class="border-top-white border-bottom-white">금액</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{range $vendor, $expenses := $.Vendors}}
+                                                <tr>
+                                                    <td class="border-top-gray border-right-white">{{$vendor}}</td>
+                                                    <td class="border-top-gray">{{decryptCostFunc $expenses true}}</td>
+                                                </tr>
+                                            {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </span>
+                        </td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-white text-right">{{decryptCostFunc .CostSum.Total true}}</td>
+                        <td style="font-size: large;" class="border-bottom-white text-right">{{decryptCostFunc .CostSum.Revenue true}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mx-auto pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportdetailsm" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    <label class="text-muted">[업데이트된 시간: &nbsp;{{changeDateFormatFunc .UpdatedTime}}]&nbsp;</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto">
+            <table name="projectdetailtable" id="projectdetailtable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray">Status</th>
+                        <th class="border-top-white border-bottom-white border-right-white">날짜</th>
+                        <th class="border-top-white border-bottom-white border-right-white">월별 매출</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">내부 인건비</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">진행비</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">구매비</th>
+                        <th class="border-top-white border-bottom-white border-right-white">외주비</th>
+                        <th class="border-top-white border-bottom-white">수익</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $mi := .MonthlyInfo}}
+                    {{$date := $mi.Date}}
+                    <tr>
+                        {{$s := index $.Project.SMStatus $date}}
+                        {{$ps := getStatusFunc $.Status $s}}
+                        <!-- status -->
+                        <td class="border-top-gray border-right-gray" style="background-color: {{$ps.BGColor}}; color: {{$ps.TextColor}};"> 
+                            {{$ps.ID}}
+                        </td>
+                        <!-- 날짜 -->
+                        <td class="border-top-gray border-right-white">
+                            {{stringToDateFunc $date}}
+                        </td>
+                        <!-- 월별 매출 -->
+                        <td class="border-top-gray border-right-white text-right">
+                            {{decryptCostFunc $mi.Payment true}}
+                        </td>
+                        <!-- 내부 인건비 -->
+                        <td class="border-top-gray border-right-gray text-right">
+                            {{decryptCostFunc $mi.LaborCost true}}
+                        </td>
+                        <!-- 진행비 -->
+                        <td class="border-top-gray border-right-gray text-right">
+                            {{decryptCostFunc (index $.Project.SMMonthlyProgressCost $date) true}}
+                        </td>
+                        <!-- 구매비 -->
+                        <td class="border-top-gray border-right-gray text-right">
+                            {{totalOfPurchaseCostFunc $.Project.SMMonthlyPurchaseCost $date true}}
+                            <!-- 구매비 - 세부 사항 -->
+                            <span class="dropright">
+                                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <table class="dropdown-header text-center text-white">
+                                        <thead>
+                                            <tr>
+                                                <th class="border-top-white border-right-white border-bottom-white">업체명</th>
+                                                <th class="border-top-white border-right-white border-bottom-white">내역</th>
+                                                <th class="border-top-white border-bottom-white">금액</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{range $pur := index $.Project.SMMonthlyPurchaseCost $date}}
+                                                <tr>
+                                                    <td class="border-top-gray border-right-white">{{$pur.CompanyName}}</td>
+                                                    <td class="border-top-gray border-right-white">{{$pur.Detail}}</td>
+                                                    <td class="border-top-gray">{{decryptCostFunc $pur.Expenses true}}</td>
+                                                </tr>
+                                            {{end}}                                
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </span>
+                        </td>
+                        <!-- 외주비 -->
+                        <td class="border-top-gray border-right-white text-right">
+                            {{decryptCostFunc $mi.Vendor true}}
+                        </td>
+                        <!-- 수익 -->
+                        <td class="border-top-gray text-right font-weight-bold {{getColorOfRevenueFunc $mi.Revenue}}">
+                            {{decryptCostFunc $mi.Revenue true}}
+                        </td>
+                    </tr>
+                    {{end}}
+                    <tr>
+                        <td class="border-top-white border-right-white total" colspan="2">합계</td>
+                        <td class="border-top-white border-right-white text-right total">{{decryptCostFunc .CostSum.Payment true}}</td>
+                        <td class="border-top-white border-right-gray text-right total">{{totalLaborOfCostSumFunc .CostSum}}</td>
+                        <td class="border-top-white border-right-gray text-right total">{{decryptCostFunc .CostSum.Progress true}}</td>
+                        <td class="border-top-white border-right-gray text-right total">{{decryptCostFunc .CostSum.Purchase true}}</td>
+                        <td class="border-top-white border-right-white text-right total">{{decryptCostFunc .CostSum.Vendor true}}</td>
+                        <td class="border-top-white text-right total {{getColorOfRevenueFunc $.CostSum.Revenue}}">{{decryptCostFunc .CostSum.Revenue true}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center pt-5 pb-5">
+            <input class="btn btn-darkmode" type="button" value="BACK" onclick="history.go(-1)">
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

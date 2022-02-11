@@ -1,0 +1,135 @@
+{{define "help-smvendorstatus"}}
+    <!-- 외주 현황 Help -->
+    <div class="p-5">
+        <h3 class="pt-5 pb-4 text-darkmode text-center">외주 현황표</h3>
+        <div class="row justify-content-center align-items-center mx-auto pt-4 pb-2">
+            <div class="col-lg-10">
+                <div class="d-flex bd-highlight">
+                    <div class="mr-auto bd-highlight">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </div>
+                    <div class="col-sm-1 bd-highlight" style="padding-right: 0;">
+                        <input class="form-control" type="number" format="yyyy" placeholder="yyyy" value="2021">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto">
+            <div class="col-lg-10">
+                <table name="smvendorstatustable" id="smvendorstatustable" class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">프로젝트</th>
+                            <th class="border-top-white border-bottom-white border-right-white" rowspan="2">벤더명</th>
+                            <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">계약일</th>
+                            <th class="border-top-white border-bottom-white border-right-white" rowspan="2">계약 금액</th>
+                            <th class="border-top-white border-bottom-gray border-right-white" colspan="12">2021년</th>
+                            <th class="border-top-white border-bottom-white total" rowspan="2">Total</th>
+                        </tr>
+                        <tr>
+                            <th class="border-right-gray border-bottom-white">1월</th>
+                            <th class="border-right-gray border-bottom-white">2월</th>
+                            <th class="border-right-gray border-bottom-white">3월</th>
+                            <th class="border-right-gray border-bottom-white">4월</th>
+                            <th class="border-right-gray border-bottom-white">5월</th>
+                            <th class="border-right-gray border-bottom-white">6월</th>
+                            <th class="border-right-gray border-bottom-white">7월</th>
+                            <th class="border-right-gray border-bottom-white">8월</th>
+                            <th class="border-right-gray border-bottom-white">9월</th>
+                            <th class="border-right-gray border-bottom-white">10월</th>
+                            <th class="border-right-gray border-bottom-white">11월</th>
+                            <th class="border-bottom-white">12월</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border-top-gray border-right-gray" rowspan="2">유열의 음악앨범</td>
+                            <td class="border-top-gray border-right-white">웨스트월드</td>
+                            <td class="border-top-gray border-right-gray">2021년 03월 05일</td>
+                            <td class="border-top-gray border-right-white text-right" style="font-weight: bold;">1,000,000</td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray text-right" data-toggle="tooltip" data-placement="top" title="계약금 : 500,000 (발행일 : 2021년 03월 11일, 지급일 : 2021년 03월 20일) OK" style="font-weight: bold; color: #ecc585;">500,000</td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-white"></td>
+                            <td class="border-top-gray total text-right">500,000</td>
+                        </tr>
+                        <tr>
+                            <td class="border-top-gray border-right-white">벙커</td>
+                            <td class="border-top-gray border-right-gray">2021년 02월 22일</td>
+                            <td class="border-top-gray border-right-white text-right" style="font-weight: bold;">1,000,000</td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray text-right" data-toggle="tooltip" data-placement="top" title="잔금 : 500,000 (발행일 : 2021년 02월 23일)">500,000</td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-gray"></td>
+                            <td class="border-top-gray border-right-white"></td>
+                            <td class="border-top-gray text-right total">500,000</td>
+                        </tr>
+                        <tr>
+                            <td class="border-top-white border-right-gray total" colspan="3">Total</td>
+                            <td class="border-top-white border-right-white text-right total">2,000,000</td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total">500,000</td>
+                            <td class="border-top-white border-right-gray text-right total">500,000</td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-gray text-right total"></td>
+                            <td class="border-top-white border-right-white text-right total"></td>
+                            <td class="border-top-white text-right total">1,000,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="text-center text-darkmode">
+            <p class="h6 font-weight-light pt-3">
+                <p class="h6 font-weight-light">
+                    선택한 연도에 지출된 혹은 지출되는 프로젝트별 외주 업체들의 금액을 월별로 확인할 수 있는 페이지입니다.<br>
+                    외주 업체의 발행일을 기준으로 가져옵니다.<br><br>
+                    금액 위에 마우스를 올리면, 금액의 타입과 발행일 및 지급일을 확인할 수 있습니다.<br>
+                    금액이 지급 완료된 경우에는 색칠이 되어 확인할 수 있습니다.
+                </p>
+                <br>
+                {{if eq .Token.AccessLevel 4}}
+                    <p class="h6 font-weight-light">
+                        <span class="btn btn-outline-warning btn-sm">Download</span>
+                        : 외주 현황 데이터를 엑셀 파일로 다운로드합니다.
+                    </p>
+                {{end}}
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-1" style="padding-right:5px">
+                            <input class="form-control" type="number" format="yyyy" placeholder="yyyy" value="2021">
+                        </div>
+                        <div class="col-4 text-left pt-2" style="padding-left:0px">
+                            : 연도별로 외주 업체를 검색합니다.
+                        </div>
+                    </div>
+                </p>
+            </p>
+        </div>
+    </div>
+{{end}}

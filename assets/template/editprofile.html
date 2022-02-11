@@ -1,0 +1,66 @@
+{{define "editprofile"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="pt-5 pb-5">
+        <h2 class="text-center section-heading text-muted">Profile: {{.User.ID}}</h2>
+    </div>
+    <form method="post" action="/editprofile-submit" onsubmit="return profilePageBlankCheckFunc()">
+    <div class="col-lg-6 col-md-6 col-sm-12 mx-auto">
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="text-muted">Team</label>
+                    <input type="text" class="form-control" id="team" name="team" value="{{.User.Team}}">
+                    <small class="form-text text-muted">팀</small>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="text-muted">Name</label>
+                    <input type="text" class="form-control" id="name" name="name" value="{{.User.Name}}">
+                    <small class="form-text text-muted">이름</small>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="text-muted">비밀번호</label>
+                    <a class="ml-4 text-warning" href="/updatepassword?id={{.User.ID}}"><u>Update Password</u></a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="text-muted">AccessLevel</label>
+                    <input type="text" class="form-control" value="{{intToAccessLevelFunc .User.AccessLevel}}" disabled>
+                    <small class="form-text text-muted">권한</small>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label class="text-muted">Token</label>
+                    <input type="text" class="form-control" value="{{.User.Token}}" disabled>
+                    <small class="form-text text-muted">RestAPI에 접근할 수 있는 Token</small>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            <button type="submit" class="btn btn-darkmode mt-5 mb-5">Update</button>
+        </div>
+    </div>
+    </form>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

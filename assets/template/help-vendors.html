@@ -1,0 +1,269 @@
+{{define "help-vendors"}}
+    <!-- Vendors Help -->
+    <div class="p-5">
+        <h3 class="pt-5 pb-5 text-darkmode text-center">Vendor</h3>
+        <div class="d-flex pb-3">
+            <div class="mr-auto bd-highlight" style="padding-left: 30px;">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" value="true" checked>
+                    <label class="custom-control-label text-white">프로젝트별</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" value="false">
+                    <label class="custom-control-label text-white">외주업체별</label>
+                </div>
+            </div>
+            <div class="bd-highlight" style="padding-right: 30px;">
+                <label class="text-white pr-1" for="isfinished">정산완료</label>
+                <input type="checkbox" data-toggle="toggle" id="isfinished" name="isfinished" data-offstyle="secondary" data-size="small" data-style="ios">
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center m-3">
+            <div class="col-lg-10">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <select name="status" id="status" class="custom-select left-radius">
+                            <option value="">All</option>
+                            <option value="downpayment">계약금</option>
+                            <option value="mediumplating">중도금</option>
+                            <option value="balance">잔금</option>
+                        </select>
+                    </div>
+                    <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="">
+                    <div class="input-group-append">
+                        <button class="btn btn-darkmode" id="button">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto pt-4 pb-2">
+            <div class="col-lg-12">
+                <div class="d-flex bd-highlight">
+                    <div class="mr-auto bd-highlight">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </div>
+                    <div class="bd-highlight">
+                        {{if ge .Token.AccessLevel 3}}
+                            <span class="btn btn-outline-warning btn-sm">+</span>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto">
+            <div class="col-lg-12">
+                <table name="vendortable" id="vendortable" class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-top-white border-bottom-white border-right-gray">프로젝트</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">벤더명</th>
+                            <th class="border-top-white border-bottom-white border-right-white">계약일</th>
+                            <th class="border-top-white border-bottom-white border-right-gray total">Total</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">계약금</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">중도금</th>
+                            <th class="border-top-white border-bottom-white border-right-white">잔금</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">컷수</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">태스크</th>
+                            <th class="border-top-white border-bottom-white border-right-white">컷별단가</th>
+                            <th class="border-top-white border-bottom-white {{if ge .Token.AccessLevel 3}} border-right-white {{end}}">정산체크</th>
+                            {{if ge .Token.AccessLevel 3}}
+                                <th class="border-top-white border-bottom-white"></th>
+                            {{end}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td rowspan="2" class="border-right-gray">유열의 음악앨범</td>
+                            <td class="border-right-gray">웨스트월드</td>
+                            <td class="border-right-white">2020년 10월 15일</td>
+                            <td class="text-right total border-right-gray">1,000,000</td>
+                            <td class="text-right border-right-gray">
+                                500,000
+                                <span class="dropright">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="dropdown-header text-center text-white">
+                                            <h6>세금 계산서 발행일 : 2020년 11월 18일</h6>
+                                            <h6 style="font-weight: bold; color: #ecc585;">지급일 : 2020년 11월 27일</h6>
+                                        </div>
+                                    </div>
+                                </span>
+                            </td>
+                            <td class="border-right-gray"></td> <!-- 중도금 빈칸 -->
+                            <td class="text-right border-right-white">
+                                500,000
+                                <span class="dropright">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="dropdown-header text-center text-white">
+                                            <h6>세금 계산서 발행일 : 2021년 04월 18일</h6>
+                                            <h6>지급일 : </h6>
+                                        </div>
+                                    </div>
+                                </span>
+                            </td>
+                            <td class="border-right-gray">30</td>
+                            <td class="border-right-gray">comp,fx</td>
+                            <td class="border-right-white text-right">33,333</td>
+                            <td {{if ge .Token.AccessLevel 3}} class="border-right-white" {{end}}>
+                                <div class="custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" name="downpaymentstatus" id="downpaymentstatus" checked disabled>
+                                    <label class="text-white custom-control-label" for="downpaymentstatus">계약금</label>
+                                </div>
+                                <div class="custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" disabled>
+                                    <label class="text-white custom-control-label" for="balancestatus">잔금</label>
+                                </div>
+                            </td>
+                            {{if ge .Token.AccessLevel 3}}
+                                <td>
+                                    <span class="finger badge badge-warning">Edit</span>
+                                    {{if eq .Token.AccessLevel 4}}
+                                        <span class="finger badge badge-danger">Del</span>
+                                    {{end}}
+                                </td>
+                            {{end}}
+                        </tr>
+                        <tr>
+                            <td class="border-top-gray border-right-gray">벙커</td>
+                            <td class="border-top-gray border-right-white">2021년 01월 10일</td>
+                            <td class="text-right total border-top-gray border-right-gray">1,000,000</td>
+                            <td class="text-right border-top-gray border-right-gray">
+                                300,000
+                                <span class="dropright">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="dropdown-header text-center text-white">
+                                            <h6>세금 계산서 발행일 : 2021년 01월 15일</h6>
+                                            <h6 style="font-weight: bold; color: #ecc585;">지급일 : 2021년 01월 27일</h6>
+                                        </div>
+                                    </div>
+                                </span>
+                            </td>
+                            <td class="text-right border-right-gray border-top-gray">
+                                300,000
+                                <span class="dropright">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="dropdown-header text-center text-white">
+                                            <h6>세금 계산서 발행일 : 2021년 02월 15일</h6>
+                                            <h6 style="font-weight: bold; color: #ecc585;">지급일 : 2021년 02월 27일</h6>
+                                        </div>
+                                    </div>
+                                </span>
+                            </td>
+                            <td class="text-right border-top-gray border-right-white">
+                                400,000
+                                <span class="dropright">
+                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                        <div class="dropdown-header text-center text-white">
+                                            <h6>세금 계산서 발행일 : 2021년 04월 18일</h6>
+                                            <h6>지급일 : </h6>
+                                        </div>
+                                    </div>
+                                </span>
+                            </td>
+                            <td class="border-top-gray border-right-gray">20</td>
+                            <td class="border-top-gray border-right-gray">comp</td>
+                            <td class="border-top-gray border-right-white text-right">50,000</td>
+                            <td class="border-top-gray {{if ge .Token.AccessLevel 3}} border-right-white {{end}}">
+                                <div class="custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" name="downpaymentstatus" id="downpaymentstatus" checked disabled>
+                                    <label class="text-white custom-control-label" for="downpaymentstatus">계약금</label>
+                                </div>
+                                <div class="custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" checked disabled>
+                                    <label class="text-white custom-control-label" for="balancestatus">중도금</label>
+                                </div>
+                                <div class="custom-control custom-checkbox custom-control-inline">
+                                    <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" disabled>
+                                    <label class="text-white custom-control-label" for="balancestatus">잔금</label>
+                                </div>
+                            </td>
+                            {{if ge .Token.AccessLevel 3}}
+                                <td class="border-top-gray">
+                                    <span class="finger badge badge-warning">Edit</span>
+                                    {{if eq $.Token.AccessLevel 4}}
+                                        <span class="finger badge badge-danger">Del</span>
+                                    {{end}}
+                                </td>
+                            {{end}}
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="text-center text-darkmode">
+            <p class="h6 font-weight-light pt-3">
+                <p class="h6 font-weight-light">외주 업체를 관리할 수 있는 페이지입니다. </p>
+                <br>
+                <p class="h6 font-weight-light">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" value="true" checked>
+                        <label class="custom-control-label text-white">프로젝트별</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" class="custom-control-input" value="false">
+                        <label class="custom-control-label text-white">외주업체별</label>
+                    </div>
+                    : 프로젝트 혹은 외주 업체별로 외주 업체를 확인합니다.
+                </p>
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-1" style="padding-right:5px">
+                            <select name="status" id="status" class="custom-select left-radius">
+                                <option value="">All</option>
+                                <option value="downpayment">계약금</option>
+                                <option value="mediumplating">중도금</option>
+                                <option value="balance">잔금</option>
+                            </select>
+                        </div>
+                        <div class="col-4 text-left pt-2" style="padding-left:0px">
+                            : 계약금, 중도금, 잔금 중 정산되지 않은 프로젝트를 검색합니다.
+                        </div>
+                    </div>
+                </p>
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-2" style="padding-left: 100px;">
+                            <label class="text-white pr-1" for="isfinished">정산완료</label>
+                            <input type="checkbox" data-toggle="toggle" id="isfinished" name="isfinished" data-offstyle="secondary" data-size="small" data-style="ios">
+                        </div>
+                        <div class="col-4 text-left pt-2" style="padding-left:0px">
+                            : 정산 완료된 프로젝트를 확인할 수 있는 옵션입니다.
+                        </div>
+                    </div>
+                </p>
+                {{if eq .Token.AccessLevel 4}}
+                    <p class="h6 font-weight-light">
+                        <span class="btn btn-outline-warning btn-sm">Download</span>
+                        : 외주 업체 데이터를 엑셀 파일로 다운로드합니다.
+                    </p>
+                {{end}}
+                {{if ge .Token.AccessLevel 3}}
+                    <p class="h6 font-weight-light">
+                        <span class="btn btn-outline-warning btn-sm">+</span>
+                        : 외주 업체를 추가합니다.
+                    </p>
+                    <p class="h6 font-weight-light">
+                        <span class="finger badge badge-warning">Edit</span>
+                        : 외주 업체 데이터를 수정하는 페이지로 이동합니다.
+                    </p>
+                {{end}}
+                {{if eq .Token.AccessLevel 4}}
+                    <p class="h6 font-weight-light">
+                        <span class="finger badge badge-danger">Del</span>
+                        : 외주 업체를 삭제합니다.
+                    </p>
+                {{end}}
+            </p>
+        </div>
+    </div>
+{{end}}

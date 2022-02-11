@@ -1,0 +1,70 @@
+{{define "help-users"}}
+    <!-- User Help -->
+    <div class="container p-5">
+        <h3 class="pb-3 pb-4 text-center text-darkmode">Users</h3>
+
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto" style="width: 800px;">
+            <table class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray">ID</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">Team</th>
+                        <th class="border-top-white border-bottom-white border-right-white">Name</th>
+                        <th class="border-top-white border-bottom-white border-right-white">비밀번호</th>
+                        <th class="border-top-white border-bottom-white border-right-white">Access level</th>
+                        <th class="border-top-white border-bottom-white"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border-right-gray">junseop.kim</td>
+                        <td class="border-right-gray">TD</td>
+                        <td class="border-right-white">김준섭</td>
+                        <td class="border-right-white"><span class="badge badge-warning">Change Password</span></td>
+                        <td class="border-right-white">
+                            <select name="accesslevel" class="form-control">
+                                <option value="0">Guest</option>
+                                <option value="1" selected>Default</option>
+                                <option value="2">Member</option>
+                                <option value="3">Manager</option>
+                                <option value="4">Admin</option>
+                            </select>
+                        </td>
+                        <td><span class="finger badge badge-danger">Del</span></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="text-center pt-4">
+                <span class="btn btn-outline-warning mt-2">Save</span>
+            </div>
+        </div>
+        
+        <div class="text-center text-darkmode">
+            <p class="h6 font-weight-light pt-4 mx-auto">
+                <p class="h6 font-weight-light">가입된 모든 유저들을 관리할 수 있는 페이지입니다.</p>
+                <div class="d-flex justify-content-center">
+                    <div class="p-2">
+                        <span>
+                            <select name="accesslevel" class="form-control">
+                                <option value="0">Guest</option>
+                                    <option value="1" selected>Default</option>
+                                    <option value="2">Member</option>
+                                    <option value="3">Manager</option>
+                                    <option value="4">Admin</option>
+                            </select>
+                        </span>
+                    </div>
+                    <div class="p-2">
+                        <p class="h6 font-weight-light pt-2 mx-auto">: 해당 유저의 AccessLevel을 변경할 수 있습니다.</p>
+                    </div>
+                </div>
+                <p class="h6 font-weight-light pt-2"><span class="finger badge badge-warning">Change Password</span>
+                : 해당 유저의 비밀번호를 변경할 수 있습니다.
+                </p>
+                <p class="h6 font-weight-light pt-2"><span class="finger badge badge-danger">Del</span>
+                : 해당 유저를 삭제할 수 있습니다.
+                </p>
+            </p>
+        </div>
+    </div>
+{{end}}

@@ -1,0 +1,93 @@
+{{define "modal-adminsetting"}}
+<div class="">
+    <input type="hidden" id="token" value="{{.User.Token}}">
+    <!-- Modal : Remove Timelog By Exclude ID -->
+    <div class="modal" id="modal-rmtimelogbyid" tabindex="-1" role="dialog" aria-labelledby="modal-rmtimelogbyid" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color: #2e2d2d;">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-rmtimelogbyid-title">Remove Timelog By ID</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-rmtimelogbyid-id" class="col-form-label text-white">아래의 ID를 가진 아티스트가 작성한 타임로그를 모두 삭제합니다.<br>삭제하시겠습니까?</label>
+                        <textarea class="form-control" id="modal-rmtimelogbyid-id" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" id="modal-rmtimelogbyid-btn" onclick="rmTimelogByIDFunc(document.getElementById('modal-rmtimelogbyid-id').value)">Delete</button>
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal : Remove Timelog By Exclude Project -->
+    <div class="modal" id="modal-rmtimelogbyproject" tabindex="-1" role="dialog" aria-labelledby="modal-rmtimelogbyproject" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color: #2e2d2d;">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-rmtimelogbyproject-title">Remove Timelog By Project</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-rmtimelogbyproject-project" class="col-form-label text-white">아래의 프로젝트에 작성한 타임로그를 모두 삭제합니다.<br>삭제하시겠습니까?</label>
+                        <textarea class="form-control" id="modal-rmtimelogbyproject-project" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" id="modal-rmtimelogbyproject-btn" onclick="rmTimelogByProjectFunc(document.getElementById('modal-rmtimelogbyproject-project').value)">Delete</button>
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal: Check Reset Timelog -->
+    <div class="modal" id="modal-checkresettimelog" tabindex="-1" role="dialog" aria-labelledby="modal-checkresettimelog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color:#2e2d2d">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-checkresettimelog-title">Reset Timelog</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span id="close" aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="text-muted">VFX Supervisors에 설정한 수퍼바이저의 타임로그를 제외한 VFX팀의 모든 타임로그가 삭제된 후 업데이트됩니다.<br><br>리셋하시겠습니까?</h6>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-toggle="modal" data-target="#modal-resettimelog" data-dismiss="modal">Reset</button>
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal: Reset Timelog -->
+    <div class="modal" id="modal-resettimelog" tabindex="-1" role="dialog" aria-labelledby="modal-resettimelog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color:#2e2d2d">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-resettimelog-title">Reset Timelog</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span id="close" aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h6 class="text-center text-muted pb-2">타임로그를 리셋합니다<br>시간이 다소 걸릴 수 있습니다.</h6>
+                    <div class="progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">Reset...</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

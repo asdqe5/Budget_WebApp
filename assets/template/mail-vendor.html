@@ -1,0 +1,20 @@
+{{define "mail-vendor"}}
+<html>
+    <body>
+        <h3><b>벤더 세금계산서 발행일 알람 메일입니다</b></h3><br><br>
+        ---------------------------------------------------<br><br>
+        {{range $v := .Vendors}}
+            <h4>프로젝트: {{$v.ProjectName}}</h4><br>
+            <h4>벤더: {{$v.Name}}</h4><br>
+            {{if eq $v.Downpayment.Date $.Date}}
+                <h4>계약금 세금계산서 발행 날짜입니다.</h4>
+            {{else if eq $v.Balance.Date $.Date}}
+                <h4>잔금 세금계산서 발행 날짜입니다.</h4>
+            {{else}}
+                <h4>중도금 세금계산서 발행 날짜입니다.</h4>
+            {{end}}
+            <br>---------------------------------------------------<br><br>
+        {{end}}
+    </body>
+</html>
+{{end}}

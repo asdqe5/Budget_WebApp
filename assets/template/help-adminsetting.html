@@ -1,0 +1,380 @@
+{{define "help-adminsetting"}}
+    <!-- Admin Setting Help -->
+    <div class="p-5">
+        <h3 class="pt-5 pb-4 text-darkmode text-center">Admin Setting</h3>
+        <div class="row justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< VFX 부서 및 팀 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">Depts</label>
+                    <input type="text" name="vfxdepts" class="form-control" placeholder="3D Art comp MNG PROD Sup" value="3D" readonly>
+                    <small class="form-text text-muted">VFX에 속하는 부서를 입력해주세요. 띄어쓰기로 구분하며 Shotgun의 팀 태그와 일치해야 합니다.</small>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">Teams</label>
+                    <small class="form-text text-muted pb-3">VFX에 속하는 Dept(팀 태그) 각각에 해당하는 팀들입니다.<br>변경은 Shotgun에서 가능합니다.</small>
+                    <div class="pb-2">
+                        <h6 class="section-heading text-muted"> - 3D</h6>
+                        <div>
+                            <span class="tag badge badge-outline-darkmode">Animation</span>
+                            <span class="tag badge badge-outline-darkmode">Asset & Lookdev</span>
+                            <span class="tag badge badge-outline-darkmode">FX</span>
+                            <span class="tag badge badge-outline-darkmode">Lookdev & Lighting</span>
+                            <span class="tag badge badge-outline-darkmode">MatchMove</span>
+                            <span class="tag badge badge-outline-darkmode">Previz</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    VFX 본부의 부서를 세팅하는 부분입니다.<br>
+                    <br>
+                    • 입력 칸에 Shotgun의 팀 태그에 해당하는 부서를 입력해주시면 됩니다.<br>
+                    • 입력된 팀 태그를 기준으로 Shotgun 팀 태그에 해당하는 팀들이 자동으로 저장됩니다.<br>
+                    • 부서나 팀에 변동이 있는 경우 Shotgun에서 수정을 해주셔야 합니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< CM 팀 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">Teams</label>
+                    <input type="text" name="cmteams" class="form-control" placeholder="Flame 3D FX Production" value="">
+                    <small class="form-text text-muted">CM 본부에 속하는 팀을 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    CM 본부의 팀을 세팅하는 부분입니다.<br>
+                    <br>
+                    • 입력 칸에 CM 본부에 해당하는 팀 이름을 입력해주시면 됩니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< 프로젝트 Status 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <div class="row pt-2">
+                        <div class="col">
+                            <label class="text-muted">Status Name</label>
+                            <input type="text" name="statusid" class="form-control" placeholder="status name" value="RDY">
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">Text</label>
+                            <input class="jscolor{valueElement:'textcolor1'} btn border border-light w-100">
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">BG</label>
+                            <input class="jscolor{valueElement:'bgcolor1'} btn border border-light w-100">
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="col"></div>
+                        <div class="col">
+                            <input id="textcolor1" name="textcolor1" type="text" class="form-control" value="9D9D9D">
+                            <small class="form-text text-muted">Status 글자색</small>
+                        </div>
+                        <div class="col">
+                            <input id="bgcolor1" name="bgcolor1" type="text" class="form-control" value="C486EB">
+                            <small class="form-text text-muted">Status 배경색</small>
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="col">
+                            <label class="text-muted">Status Name</label>
+                            <input type="text" name="statusid" class="form-control" placeholder="status name" value="WIP">
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">Text</label>
+                            <input class="jscolor{valueElement:'textcolor2'} btn border border-light w-100">
+                        </div>
+                        <div class="col">
+                            <label class="text-muted">BG</label>
+                            <input class="jscolor{valueElement:'bgcolor2'} btn border border-light w-100">
+                        </div>
+                    </div>
+                    <div class="row pt-2">
+                        <div class="col"></div>
+                        <div class="col">
+                            <input id="textcolor2" name="textcolor2" type="text" class="form-control" value="FFFFFF">
+                            <small class="form-text text-muted">Status 글자색</small>
+                        </div>
+                        <div class="col">
+                            <input id="bgcolor2" name="bgcolor2" type="text" class="form-control" value="6885E8">
+                            <small class="form-text text-muted">Status 배경색</small>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <span id="statusaddbtn" class="add float-right mt-2">+</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    프로젝트의 Status를 세팅하는 부분입니다.<br>
+                    <br>
+                    • Status Name 입력 칸에 원하시는 Status의 이름을 입력해주시면 됩니다.<br>
+                    • 각각의 Status의 글자색과 배경색을 관리자가 원하는 색에 맞게 변경할 수 있습니다.<br>
+                    • <span class="add">+</span> 버튼을 클릭해서 원하는 Status를 추가할 수 있습니다.<br>
+                    • Status Name을 지운 상태로 저장을 하면 해당 Status를 지울 수 있습니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< 태스크 및 기타 프로젝트 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">태스크로 구분할 프로젝트</label>
+                    <input type="text" name="taskprojects" class="form-control" placeholder="VFX" value="VFX" readonly>
+                    <small class="form-text text-muted">태스크네임으로 프로젝트를 구분할 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">RND 프로젝트</label>
+                    <input type="text" name="rndprojects" class="form-control" value="RND2020 RND RNDTF" readonly>
+                    <small class="form-text text-muted">타임로그를 업데이트할 때 RND 프로젝트로 처리힐 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">ETC 프로젝트</label>
+                    <input type="text" name="etcprojects" class="form-control" value="ETC" readonly>
+                    <small class="form-text text-muted">타임로그를 업데이트할 때 ETC 프로젝트로 처리힐 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    태스크로 구분할 프로젝트 및 기타 프로젝트를 설정하는 부분입니다.<br>
+                    <br>
+                    • 샷건에서 태스크네임으로 프로젝트를 구분할 프로젝트를 입력하면 해당 프로젝트는 테스크네임을 기준으로 타임로그가 저장됩니다.<br>
+                    • RND 프로젝트에 입력한 프로젝트는 해당 연도의 RND 프로젝트의 타임로그로 저장됩니다.<br>
+                    • ETC 프로젝트에 입력한 프로젝트는 해당 연도의 ETC 프로젝트의 타임로그로 저장됩니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< Shotgun 관련 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">제외할 ID</label>
+                    <span class="badge badge-pill badge-danger float-right finger mt-1">Clear</span>
+                    <input type="text" id="sgexcludeid" name="sgexcludeid" class="form-control" placeholder="90" value="90" readonly>
+                    <small class="form-text text-muted">Shotgun에서 타임로그를 가져올 때 제외할 사용자 ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">제외할 프로젝트</label>
+                    <span class="badge badge-pill badge-danger float-right finger mt-1">Clear</span>
+                    <input type="text" id="sgexcludeprojects" name="sgexcludeprojects" class="form-control" placeholder="TDTEST2 TD2" value="TDTEST ABC CM_ART SE TD2 CM" readonly>
+                    <small class="form-text text-muted">Shotgun에서 타임로그를 가져올 때 제외할 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">업데이트된 시간 &nbsp;&nbsp;&nbsp;2021-01-28T16:07:37+09:00</label>
+                    <span class="badge badge-pill badge-danger finger mt-1 ml-2">Reset</span>
+                    <small class="form-text text-muted">Shotgun의 타임로그가 마지막으로 업데이트된 시간입니다.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    Shotgun과 연결되는 사항들을 설정할 수 있는 부분입니다.<br>
+                    <br>
+                    • Shotgun에서 타임로그 및 프로젝트 등의 정보를 가져오는 경우 제외할 ID, 프로젝트를 설정할 수 있습니다.<br>
+                    • <span class="badge badge-pill badge-danger finger">Clear</span> 버튼을 누르면 해당 칸에 입력된 정보에 해당하는 타임로그를 삭제할 수 있습니다.<br>
+                    • 타임로그가 업데이트된 시간을 확인할 수 있으며, <span class="badge badge-pill badge-danger finger">Reset</span> 버튼을 누르면 모든 타임로그를 리셋할 수 있습니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 40%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< 월별 결산 상태 관련 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">월별 상태</label>
+                    <div class="form-control">
+                        <div class="row">
+                            <div class="col-1"></div>
+                            <div class="col-3">
+                                <label class="text-muted">2020년 12월</label>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="lastMonthlyStatus1" name="lastMonthlyStatus1" class="custom-control-input" value="true" checked>
+                                    <label class="custom-control-label text-muted" for="lastMonthlyStatus1">Yes</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="lastmonthlystatus2" name="lastMonthlyStatus1" class="custom-control-input" value="false">
+                                    <label class="custom-control-label text-muted" for="lastmonthlystatus2">No</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-1"></div>
+                            <div class="col-3">
+                                <label class="text-muted">2021년 1월</label>
+                            </div>
+                            <div class="col-3"></div>
+                            <div class="col">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="curMonthlyStatus1" name="curMonthlyStatus1" class="custom-control-input" value="true">
+                                    <label class="custom-control-label text-muted" for="curMonthlyStatus1">Yes</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="curmonthlystatus2" name="curMonthlyStatus1" class="custom-control-input" value="false" checked>
+                                    <label class="custom-control-label text-muted" for="curmonthlystatus2">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <small class="form-text text-muted">결산이 완료되었으면 Yes로 설정해주세요. Yes로 설정되어 있으면 그 달의 타임로그는 업데이트되지 않습니다.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    월별 결산 상태를 설정할 수 있는 부분입니다.<br>
+                    <br>
+                    • 지난달과 이번달의 결산 상태를 확인 및 설정할 수 있습니다.<br>
+                    • 결산이 완료된 경우 Yes로 체크하면 해당 월의 타임로그는 더이상 업데이트되지 않습니다.<br>
+                    <b style="color: #dc3545;">• 반드시 지난달의 결산 상태를 다음달이 되기 전에 Yes로 설정해주시기 바랍니다.</b><br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< VFX Supervisors 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">VFX Supervisors</label>
+                    <input type="text" name="smsupervisorids" class="form-control" placeholder="92 155 511" value="92 155 511" readonly>
+                    <small class="form-text text-muted">수퍼바이저의 Shotgun ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    VFX 본부의 Supervisor를 설정할 수 있는 부분입니다.<br>
+                    <br>
+                    • 해당하는 사람의 Shotgun ID를 입력하면 프로젝트 결산에 VFX Supervisor로 설정됩니다.<br>
+                    • 프로젝트 관리 페이지에서 확인 할 수 있으며, 프로젝트 수정 페이지에서 해당 슈퍼바이저의 타임로그를 관리할 수 있습니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 40%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< 끝난 프로젝트 결산 처리 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">끝난 프로젝트 처리 상태</label>
+                    <div class="pb-2">
+                        <label class="text-muted">2020년 12월</label>
+                        <div class="form-control">
+                            <div class="row">
+                                <div class="col-1"></div>
+                                <div class="col-3">
+                                    <label class="text-muted">JAS</label>
+                                </div>
+                                <div class="col">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="lastFTStatus1" name="lastFTStatus" class="custom-control-input" checked>
+                                        <label class="custom-control-label text-muted" for="lastFTStatus1">프로젝트로 처리</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="lastFTStatus2" name="lastFTStatus" class="custom-control-input">
+                                        <label class="custom-control-label text-muted" for="lastFTStatus2">ETC로 처리</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-muted">2021년 1월</label>
+                        <div class="form-control">
+                            <div class="row">
+                                <div class="col-1"></div>
+                                <div class="col-3">
+                                    <label class="text-muted">JAS</label>
+                                </div>
+                                <div class="col">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="curFTStatus1" name="curFTStatus" class="custom-control-input">
+                                        <label class="custom-control-label text-muted" for="curFTStatus1">프로젝트로 처리</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="curFTStatus2" name="curFTStatus" class="custom-control-input" checked>
+                                        <label class="custom-control-label text-muted" for="curFTStatus2">ETC로 처리</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    정산 완료된 프로젝트의 타임로그 처리상태를 확인 및 변경할 수 있는 부분입니다.<br>
+                    <br>
+                    • 지난달과 이번달의 처리상태를 확인할 수 있습니다.<br>
+                    • 정산 완료된 프로젝트의 타임로그가 존재하는 경우 이것을 설정에 맞게 저장할 수 있습니다.<br>
+                    • 해당 프로젝트의 타임로그로 저장하여 결산을 하거나 ETC로 저장하여 결산을 할 수 있습니다.<br>
+                    <b style="color: #dc3545;">• 해당 설정이 변경되는 경우 해당 월의 인건비가 다시 계산되기 때문에 주의해주시기 바랍니다.</b><br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4 justify-content-center align-items-center mx-auto" style="width: 50%;">
+            <div class="col">
+                <div class="pt-3 pb-3">
+                    <h5 class="section-heading text-muted">< 메일 발송 ID 설정 ></h5>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">프로젝트 발행일 메일 발송</label>
+                    <input type="text" name="projectmail" class="form-control" value="junseop.kim" readonly>
+                    <small class="form-text text-muted">프로젝트 발행일에 메일을 발송할 그룹웨어 ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+                <div class="pb-2">
+                    <label class="text-muted">벤더 발행일 메일 발송</label>
+                    <input type="text" name="rndprojects" class="form-control" value="aerim.shim" readonly>
+                    <small class="form-text text-muted">벤더 발행일에 메일을 발송할 그룹웨어 ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                </div>
+            </div>
+        </div>
+        <div class="row pb-2 pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    프로젝트 매출 세금 계산서 발행일 및 벤더 비용 세금 계산서 발행일에 메일을 보내는 서비스 설정입니다.<br>
+                    <br>
+                    • 프로젝트 발행일 메일 발송에 입력한 [그룹웨어 ID]로 프로젝트 매출 세금 계산서 발행일 당일 오전 10시에 메일이 보내집니다.<br>
+                    • 벤더 발행일 메일 발송에 입력한 [그룹웨어 ID]로 벤더 비용 세금 계산서 발행일 당일 오전 10시에 메일이 보내집니다.<br>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}

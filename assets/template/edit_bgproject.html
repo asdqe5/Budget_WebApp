@@ -1,0 +1,378 @@
+{{define "edit-bgproject"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container-md p-5">
+        <form action="/editbgproject-submit" method="POST" onsubmit="return addBGProjectPageBlankCheckFunc(false)">
+            <input type="hidden" name="searcheddate" id="searcheddate" value="{{.SearchedDate}}">
+            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-4">
+                    <h2 class="section-heading text-muted text-center">Edit Project - 예산</h2>
+                    <div class="col text-right">
+                        <label class="text-muted">[업데이트된 시간: &nbsp;{{changeDateFormatFunc .BGProject.UpdatedTime}}]&nbsp;</label>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="col">
+                
+                <div class="row mx-auto pt-3 pb-2" style="max-width: 50%;">
+                    <div class="col">
+                        <div class="ml-5 pt-3 pb-3">
+                            <h5 class="section-heading text-muted">< 프로젝트 기본 정보 ></h5>
+                        </div>
+                        <div class="row pb-2">
+                            <div class="col form-group">
+                                <label class="text-muted">Project ID</label>
+                                <input type="hidden" name="originalid" id="originalid" value="{{.BGProject.ID}}">
+                                <input type="text" class="form-control" id="id" name="id" value="{{.BGProject.ID}}">
+                                <small class="form-text text-muted">프로젝트 영문명 / 영문 및 숫자만 입력해주세요.</small>
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">프로젝트 한글명</label>
+                                <input type="text" class="form-control" id="name" name="name" value="{{.BGProject.Name}}">
+                            </div>
+                        </div>
+                        <div class="row pb-3">
+                            <div class="col form-group">
+                                <label class="text-muted">작업 예상 시작일</label>
+                                <input type="month" class="form-control" id="startdate" name="startdate" max="9999-12" value="{{.BGProject.StartDate}}">
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">작업 예상 마감일</label>
+                                <input type="month" class="form-control" id="enddate" name="enddate" max="9999-12" value="{{.BGProject.EndDate}}">
+                            </div>
+                        </div>
+                        <div class="row pb-3">
+                            <div class="col form-group">
+                                <label class="text-muted">감독</label>
+                                <input type="text" class="form-control" id="directorname" name="directorname" value="{{.BGProject.DirectorName}}">
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">제작사</label>
+                                <input type="text" class="form-control" id="producername" name="producername" value="{{.BGProject.ProducerName}}">
+                            </div>
+                        </div>
+                        <div class="row pb-3">
+                            <div class="col form-group">
+                                <label class="text-muted">Status</label>
+                                <select name="status" id="status" class="form-control custom-select left-radius right-radius">
+                                    <option value="true" {{if eq .BGProject.Status true}} selected {{end}}>계약 완료</option>
+                                    <option value="false" {{if eq .BGProject.Status false}} selected {{end}}>사전 검토</option>
+                                </select>
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">Type</label>
+                                <select name="type" id="type" class="form-control custom-select left-radius right-radius">
+                                    <option value="movie" {{if eq .BGProject.Type "movie"}} selected {{end}}>영화</option>
+                                    <option value="drama" {{if eq .BGProject.Type "drama"}} selected {{end}}>드라마</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-sm-1"></div>
+                <div class="row pt-3 pb-3 mx-auto" style="max-width: 95%;">
+                    <div class="col">
+                        <button id="btn-add-tab" type="button" class="btn btn-primary float-right" onclick="addTabFunc({{$.Supervisor}}, {{$.Production}}, {{$.Management}})">Add Tab</button>
+                        <ul id="tab-list" class="nav nav-tabs" role="tablist">
+                            {{range $index, $bgtype := .BGProject.TypeList}}
+                                <li class="nav-item">
+                                    <a class="nav-link {{if eq $index 0}} active {{end}}" id="tab{{$index}}" href="#type{{$index}}" role="tab" data-toggle="tab">{{$bgtype}}<button class="close" type="button" title="Remove this tab" style="padding-left: 10px;">x</button></a>
+                                </li>
+                            {{end}}
+                        </ul>
+                        <div id="tab-content" class="tab-content">
+                            <input type="hidden" name="tabnum" id="tabnum" value="{{len .BGProject.TypeList}}">
+                            {{range $index, $bgtype := .BGProject.TypeList}}
+                                {{$typedata := index $.BGProject.TypeData $bgtype}}
+                                <div class="tab-pane fade {{if eq $index 0}} show active {{end}}" id="type{{$index}}">
+                                    <div class="row">
+                                        <div class="col">
+                                            <div class="row pt-3 pb-3">
+                                                <div class="ml-5">
+                                                    <h5 class="section-heading text-muted">< 프로젝트 예산안 정보 ></h5>
+                                                </div>
+                                            </div>
+                                            <div class="row pt-3 pb-2">
+                                                <input type="hidden" name="type{{$index}}-bgtypeid" value="{{$typedata.ID.Hex}}">
+                                                <div class="col form-group">
+                                                    <label class="text-muted">예산안 타입</label>
+                                                    <input type="text" class="form-control" id="type{{$index}}-bgtype" name="type{{$index}}-bgtype" value="{{$bgtype}}" onkeyup="changeTabNameFunc(this.id);">
+                                                </div>
+                                                <div class="col form-group">
+                                                    <label class="text-muted">계약일</label>
+                                                    <input type="date" class="form-control" id="type{{$index}}-bgcontractdate" name="type{{$index}}-bgcontractdate" max="9999-12-31" value="{{$typedata.ContractDate}}">
+                                                </div>
+                                                <div class="col form-group" style="left: 30px;">
+                                                    <div class="row">
+                                                        <label class="text-muted">실행 예산 확정</label>
+                                                    </div>
+                                                    <div class="row pt-2">
+                                                        <div class="custom-control custom-radio custom-control-inline" style="padding-left: 35px;">
+                                                            <input type="radio" id="type{{$index}}-bgmaintypestatus1" name="type{{$index}}-bgmaintypestatus" class="custom-control-input" value="true" {{if eq $.BGProject.MainType $bgtype}} checked {{end}} onclick="offOtherStatusFunc({{$index}});">
+                                                            <label class="custom-control-label text-muted" for="type{{$index}}-bgmaintypestatus1">Yes</label>
+                                                        </div>
+                                                        <div class="custom-control custom-radio custom-control-inline" style="padding-left: 35px;">
+                                                            <input type="radio" id="type{{$index}}-bgmaintypestatus2" name="type{{$index}}-bgmaintypestatus" class="custom-control-input" value="false" {{if ne $.BGProject.MainType $bgtype}} checked {{end}}>
+                                                            <label class="custom-control-label text-muted" for="type{{$index}}-bgmaintypestatus2">No</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row pb-2">
+                                                <div class="form-group col">
+                                                    <label class="text-muted">제안 견적</label>
+                                                    <input type="text" inputmode="numeric" class="form-control" id="type{{$index}}-bgproposal" name="type{{$index}}-bgproposal" {{if ne $typedata.Proposal ""}} value="{{decryptCostFunc $typedata.Proposal true}}" {{end}} onkeyup="calNegoRatioFunc('type' + {{$index}});">
+                                                    <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                </div>
+                                                <div class="form-group col">
+                                                    <label class="text-muted">계약 결정액</label>
+                                                    <input type="text" inputmode="numeric" class="form-control" id="type{{$index}}-bgdecision" name="type{{$index}}-bgdecision" {{if ne $typedata.Decision ""}} value="{{decryptCostFunc $typedata.Decision true}}" {{end}} onkeyup="calNegoRatioFunc('type' + {{$index}});">
+                                                    <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                </div>
+                                                <div class="form-group col">
+                                                    <label class="text-muted">네고율</label>
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="type{{$index}}-bgnegoratio" name="type{{$index}}-bgnegoratio" value="{{calNegoRatioFunc $typedata}}" readonly>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" style="background-color: #1C1C1C; color: #A7A59C; border: 1px solid #A7A59C;">%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row pb-2">
+                                                <div class="form-group col">
+                                                    <label class="text-muted">계약 컷수</label>
+                                                    <input type="text" inputmode="numeric" class="form-control" id="type{{$index}}-bgcontractcuts" name="type{{$index}}-bgcontractcuts" {{if ne $typedata.ContractCuts 0}} value="{{putCommaFunc $typedata.ContractCuts}}" {{end}}>
+                                                    <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                </div>
+                                                <div class="form-group col">
+                                                    <label class="text-muted">작업 컷수</label>
+                                                    <input type="text" inputmode="numeric" class="form-control" id="type{{$index}}-bgworkingcuts" name="type{{$index}}-bgworkingcuts" {{if ne $typedata.WorkingCuts 0}} value="{{putCommaFunc $typedata.WorkingCuts}}" {{end}}>
+                                                    <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                </div>
+                                                <div class="col"></div>
+                                            </div>
+                                            <div class="row pt-3 pb-3">
+                                                <div class="ml-5">
+                                                    <h5 class="section-heading text-muted">< 예산 지출 기입 ></h5>
+                                                </div>
+                                            </div>
+                                            <div class="row pb-2">
+                                                <div class="form-group col">
+                                                    <label class="text-muted">Retake율</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" id="type{{$index}}-bgretakeratio" name="type{{$index}}-bgretakeratio" step="0.01" max="100" {{if ne $typedata.RetakeRatio 0.0}} value="{{$typedata.RetakeRatio}}" {{end}}>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col">
+                                                    <label class="text-muted">진행비율</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" id="type{{$index}}-bgprogressratio" name="type{{$index}}-bgprogressratio" step="0.01" max="100" {{if ne $typedata.ProgressRatio 0.0}} value="{{$typedata.ProgressRatio}}" {{end}}>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col">
+                                                    <label class="text-muted">외주비율</label>
+                                                    <div class="input-group">
+                                                        <input type="number" class="form-control" id="type{{$index}}-bgvendorratio" name="type{{$index}}-bgvendorratio" step="0.01" max="100" {{if ne $typedata.VendorRatio 0.0}} value="{{$typedata.VendorRatio}}" {{end}}>
+                                                        <div class="input-group-append">
+                                                            <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-1"></div>
+                                        <div class="col">
+                                            <div class="row pt-3 pb-3">
+                                                <div class="col-sm-9">
+                                                    <div class="ml-5">
+                                                        <h5 class="section-heading text-muted">< 수퍼바이저 / 프로덕션 / 매니지먼트 기입 ></h5>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-1 mt-1">
+                                                    <input type="hidden" name="type{{$index}}-bgsupervisornum" id="type{{$index}}-bgsupervisornum" value="{{len $typedata.Supervisors}}">
+                                                    <span id="type{{$index}}-bgsupervisoraddbtn" class="add float-right" onclick="addBGSupervisorSettingFunc({{$.Supervisor}}, 'type' + {{$index}});">SUP</span>
+                                                </div>
+                                                <div class="col-sm-1 mt-1">
+                                                    <input type="hidden" name="type{{$index}}-bgproductionnum" id="type{{$index}}-bgproductionnum" value="{{len $typedata.Production}}">
+                                                    <span id="type{{$index}}-bgproductionaddbtn" class="add float-right" onclick="addBGProductionSettingFunc({{$.Production}}, 'type' + {{$index}});">PROD</span>
+                                                </div>
+                                                <div class="col-sm-1 mt-1">
+                                                    <input type="hidden" name="type{{$index}}-bgmanagementnum" id="type{{$index}}-bgmanagementnum" value="{{len $typedata.Management}}">
+                                                    <span id="type{{$index}}-bgmanagementaddbtn" class="add float-right" onclick="addBGManagementSettingFunc({{$.Management}}, 'type' + {{$index}});">MNG</span>
+                                                </div>
+                                            </div>
+                                            <div id="type{{$index}}-bgsupervisor">
+                                                {{range $supindex, $supmng := $typedata.Supervisors}}
+                                                    <div class="row {{if eq $supindex 0}} pt-3 {{end}} pb-1">
+                                                        <div class="col form-group">
+                                                            {{if eq $supindex 0}}
+                                                                <label class="text-muted">수퍼바이저</label>
+                                                            {{end}}
+                                                            <select name="type{{$index}}-supervisor{{$supindex}}" id="type{{$index}}-supervisor{{$supindex}}" class="form-control custom-select left-radius right-radius">
+                                                                <option value=""></option>
+                                                                {{range $sup := $.Supervisor}}
+                                                                    <option value="{{$sup.ID}}" {{if eq $sup.ID $supmng.UserID}} selected {{end}}>{{$sup.Name}}</option>
+                                                                {{end}}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $supindex 0}}
+                                                                <label class="text-muted">업무</label>
+                                                            {{end}}
+                                                            <input type="text" class="form-control" id="type{{$index}}-supervisor{{$supindex}}-bgmanagementwork" name="type{{$index}}-supervisor{{$supindex}}-bgmanagementwork" value="{{$supmng.Work}}">
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $supindex 0}}
+                                                                <label class="text-muted">참여 기간</label>
+                                                            {{end}}
+                                                            <input type="number" class="form-control" id="type{{$index}}-supervisor{{$supindex}}-bgmanagementperiod" name="type{{$index}}-supervisor{{$supindex}}-bgmanagementperiod" {{if ne $supmng.Period 0}} value="{{$supmng.Period}}" {{end}}>
+                                                            {{if eq (addIntFunc $supindex 1) (len $typedata.Supervisors)}}
+                                                                <small id="type{{$index}}-supervisor{{$supindex}}-bgmanagementperiod-label" class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                            {{end}}
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $supindex 0}}
+                                                                <label class="text-muted">참여 기간 퍼센티지</label>
+                                                            {{end}}
+                                                            <div class="input-group">
+                                                                <input type="number" class="form-control" id="type{{$index}}-supervisor{{$supindex}}-bgmanagementratio" name="type{{$index}}-supervisor{{$supindex}}-bgmanagementratio" step="0.01" max="100" {{if ne $supmng.Ratio 0.0}} value="{{$supmng.Ratio}}" {{end}}>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{end}}
+                                            </div>
+                                            <div id="type{{$index}}-bgproduction">
+                                                {{range $prodindex, $prodmng := $typedata.Production}}
+                                                    <div class="row {{if eq $prodindex 0}} pt-5 {{end}} pb-1">
+                                                        <div class="col form-group">
+                                                            {{if eq $prodindex 0}}
+                                                                <label class="text-muted">프로덕션</label>
+                                                            {{end}}
+                                                            <select name="type{{$index}}-production{{$prodindex}}" id="type{{$index}}-production{{$prodindex}}" class="form-control custom-select left-radius right-radius">
+                                                                <option value=""></option>
+                                                                {{range $prod := $.Production}}
+                                                                    <option value="{{$prod.ID}}" {{if eq $prod.ID $prodmng.UserID}} selected {{end}}>{{$prod.Name}}</option>
+                                                                {{end}}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $prodindex 0}}
+                                                                <label class="text-muted">업무</label>
+                                                            {{end}}
+                                                            <input type="text" class="form-control" id="type{{$index}}-production{{$prodindex}}-bgmanagementwork" name="type{{$index}}-production{{$prodindex}}-bgmanagementwork" value="{{$prodmng.Work}}">
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $prodindex 0}}
+                                                                <label class="text-muted">참여 기간</label>
+                                                            {{end}}
+                                                            <input type="number" class="form-control" id="type{{$index}}-production{{$prodindex}}-bgmanagementperiod" name="type{{$index}}-production{{$prodindex}}-bgmanagementperiod" {{if ne $prodmng.Period 0}} value="{{$prodmng.Period}}" {{end}}>
+                                                            {{if eq (addIntFunc $prodindex 1) (len $typedata.Production)}}
+                                                                <small id="type{{$index}}-production{{$prodindex}}-bgmanagementperiod-label" class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                            {{end}}
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $prodindex 0}}
+                                                                <label class="text-muted">참여 기간 퍼센티지</label>
+                                                            {{end}}
+                                                            <div class="input-group">
+                                                                <input type="number" class="form-control" id="type{{$index}}-production{{$prodindex}}-bgmanagementratio" name="type{{$index}}-production{{$prodindex}}-bgmanagementratio" step="0.01" max="100" {{if ne $prodmng.Ratio 0.0}} value="{{$prodmng.Ratio}}" {{end}}>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{end}}
+                                            </div>
+                                            <div id="type{{$index}}-bgmanagement">
+                                                {{range $mngindex, $mngmng := $typedata.Management}}
+                                                    <div class="row {{if eq $mngindex 0}} pt-5 {{end}} pb-1">
+                                                        <div class="col form-group">
+                                                            {{if eq $mngindex 0}}
+                                                                <label class="text-muted">매니지먼트</label>
+                                                            {{end}}
+                                                            <select name="type{{$index}}-management{{$mngindex}}" id="type{{$index}}-management{{$mngindex}}" class="form-control custom-select left-radius right-radius">
+                                                                <option value=""></option>
+                                                                {{range $mng := $.Management}}
+                                                                    <option value="{{$mng.ID}}" {{if eq $mng.ID $mngmng.UserID}} selected {{end}}>{{$mng.Name}}</option>
+                                                                {{end}}
+                                                            </select>
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $mngindex 0}}
+                                                                <label class="text-muted">업무</label>
+                                                            {{end}}
+                                                            <input type="text" class="form-control" id="type{{$index}}-management{{$mngindex}}-bgmanagementwork" name="type{{$index}}-management{{$mngindex}}-bgmanagementwork" value="{{$mngmng.Work}}">
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $mngindex 0}}
+                                                                <label class="text-muted">참여 기간</label>
+                                                            {{end}}
+                                                            <input type="number" class="form-control" id="type{{$index}}-management{{$mngindex}}-bgmanagementperiod" name="type{{$index}}-management{{$mngindex}}-bgmanagementperiod" {{if ne $mngmng.Period 0}} value="{{$mngmng.Period}}" {{end}}>
+                                                            {{if eq (addIntFunc $mngindex 1) (len $typedata.Management)}}
+                                                                <small id="type{{$index}}-management{{$mngindex}}-bgmanagementperiod-label" class="form-text text-muted">숫자만 입력해주세요.</small>
+                                                            {{end}}
+                                                        </div>
+                                                        <div class="col form-group">
+                                                            {{if eq $mngindex 0}}
+                                                                <label class="text-muted">참여 기간 퍼센티지</label>
+                                                            {{end}}
+                                                            <div class="input-group">
+                                                                <input type="number" class="form-control" id="type{{$index}}-management{{$mngindex}}-bgmanagementratio" name="type{{$index}}-management{{$mngindex}}-bgmanagementratio" step="0.01" max="100" {{if ne $mngmng.Ratio 0.0}} value="{{$mngmng.Ratio}}" {{end}}>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                {{end}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="submit" class="btn btn-outline-warning">Update</button>
+            </div>
+        </form>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script>
+    $(document).ready(function() {
+        $('#tab-list').on('click', '.close', function() {
+            var con_firm = confirm("이 예산안을 정말 삭제하시겠습니까?");
+            if (con_firm == true) {
+                var tabID = $(this).parents('a').attr('href');
+                $(this).parents('li').remove();
+                $(tabID).remove();
+    
+                // display first tab
+                var tabFirst = $('#tab-list a:first');
+                tabFirst.tab('show');
+            }
+        });
+    });
+</script>
+</html>
+{{end}}

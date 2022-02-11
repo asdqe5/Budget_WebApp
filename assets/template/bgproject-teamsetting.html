@@ -1,0 +1,207 @@
+{{define "bgproject-teamsetting"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container p-5" style="max-width: 85%;">
+        <form action="/bgproject-teamsetting-submit?id={{.ID}}&bgtype={{.BGType}}&date={{.Date}}" method="POST">
+            <div class="col mx-auto">
+                <div class="pt-3 pb-3">
+                    <h2 class="section-heading text-muted text-center">{{.ID}}_{{.BGType}}_Team Setting</h2>
+                    <div class="col text-right">
+                        <label class="text-muted">[업데이트된 시간: &nbsp;{{changeDateFormatFunc .TeamSetting.UpdatedTime}}]&nbsp;</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col">
+                <div class="pb-4">
+                    <h5 class="section-heading text-muted">< 본부별 부서 및 태스크 설정 ></h5>
+                </div>
+               
+                <div id="teamSetting">
+                    {{range $hIndex, $head := .TeamSetting.Headquarters}}
+                        <div class="row">
+                            <div class="col-2">
+                                <div class="form-group">
+                                    <label class="text-muted" for="head{{$hIndex}}">본부</label>
+                                    <input type="text" name="head{{$hIndex}}" id="head{{$hIndex}}" class="form-control" value="{{$head}}">
+                                    <small class="form-text text-muted">예산에서 사용될 본부를 입력해주세요.</small>
+                                </div>
+                            </div>
+                            <div class="col-10">
+                                <div id="head{{$hIndex}}-dept">
+                                    {{range $dIndex, $dept := index $.TeamSetting.Departments $head}}
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <div class="form-group custom-control custom-checkbox custom-control-lg" style="margin-left: 80px; margin-top: 35px;">
+                                                    <input type="checkbox" class="custom-control-input" id="head{{$hIndex}}-type{{$dIndex}}" name="head{{$hIndex}}-type{{$dIndex}}" {{if $dept.Type}}checked{{end}}>
+                                                    <label class="custom-control-label text-muted" for="head{{$hIndex}}-type{{$dIndex}}">Asset</label>
+                                                </div>
+                                            </div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <label class="text-muted" for="head{{$hIndex}}-dept{{$dIndex}}">부서</label>
+                                                    <input type="text" name="head{{$hIndex}}-dept{{$dIndex}}" id="head{{$hIndex}}-dept{{$dIndex}}" class="form-control" value="{{$dept.Name}}">
+                                                    <small class="form-text text-muted">예산에서 해당 본부에 속하는 부서를 입력해주세요.</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-7">
+                                                <div id="head{{$hIndex}}-dept{{$dIndex}}-part">
+                                                    {{range $pIndex, $part := $dept.Parts}}
+                                                        <div class="row">
+                                                            <div class="col-4">
+                                                                <div class="form-group">
+                                                                    <label class="text-muted" for="head{{$hIndex}}-dept{{$dIndex}}-part{{$pIndex}}">구분</label>
+                                                                    <input type="text" name="head{{$hIndex}}-dept{{$dIndex}}-part{{$pIndex}}" id="head{{$hIndex}}-dept{{$dIndex}}-part{{$pIndex}}" class="form-control" value="{{$part.Name}}">
+                                                                    <small class="form-text text-muted">예산에서 해당 부서에 속하는 구분을 입력해주세요.</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-8">
+                                                                <div class="form-group">
+                                                                    <label class="text-muted" for="head{{$hIndex}}-dept{{$dIndex}}-task{{$pIndex}}">태스크</label>
+                                                                    <input type="text" name="head{{$hIndex}}-dept{{$dIndex}}-task{{$pIndex}}" id="head{{$hIndex}}-dept{{$dIndex}}-task{{$pIndex}}" class="form-control" value="{{listToStringFunc $part.Tasks false}}">
+                                                                    <small class="form-text text-muted">예산에서 해당 구분에 속하는 태스크들을 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {{end}}
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <!-- 태스크 추가 버튼 -->
+                                                        <input type="hidden" id="head{{$hIndex}}-dept{{$dIndex}}-partnum" name="head{{$hIndex}}-dept{{$dIndex}}-partnum" value="{{len $dept.Parts}}">
+                                                        <span id="taskaddbtn" class="add float-right mt-2" onclick="addTeamSettingTaskFunc('{{$hIndex}}', '{{$dIndex}}');">태스크</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{end}}
+                                </div>
+                                <div id="head{{$hIndex}}-control">
+                                    {{range $cIndex, $control := index $.TeamSetting.Controls $head}}
+                                        <div class="row">
+                                            <div class="col-2"></div>
+                                            <div class="col-3">
+                                                <div class="form-group">
+                                                    <label class="text-muted" for="head{{$hIndex}}-control{{$cIndex}}">부서(SUP)</label>
+                                                    <input type="text" name="head{{$hIndex}}-control{{$cIndex}}" id="head{{$hIndex}}-control{{$cIndex}}" class="form-control" value="{{$control.Name}}">
+                                                    <small class="form-text text-muted">예산에서 해당 본부에 속하는 부서를 입력해주세요.</small>
+                                                </div>
+                                            </div>
+                                            <div class="col-7">
+                                                <div id="head{{$hIndex}}-control{{$cIndex}}-team">
+                                                    {{range $cpIndex, $controlPart := $control.Parts}}
+                                                        <div class="row">
+                                                            <div class="col-4">
+                                                                <div class="form-group">
+                                                                    <label class="text-muted" for="head{{$hIndex}}-control{{$cIndex}}-part{{$cpIndex}}">구분(SUP)</label>
+                                                                    <input type="text" name="head{{$hIndex}}-control{{$cIndex}}-part{{$cpIndex}}" id="head{{$hIndex}}-control{{$cIndex}}-part{{$cpIndex}}" class="form-control" value="{{$controlPart.Name}}">
+                                                                    <small class="form-text text-muted">예산에서 해당 부서에 속하는 구분을 입력해주세요.</small>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-8">
+                                                                <div class="form-group">
+                                                                    <label class="text-muted" for="head{{$hIndex}}-control{{$cIndex}}-team{{$cpIndex}}">팀(SUP)</label>
+                                                                    <select name="head{{$hIndex}}-control{{$cIndex}}-team{{$cpIndex}}" id="head{{$hIndex}}-control{{$cIndex}}-team{{$cpIndex}}" class="form-control teamselect" multiple="multiple">
+                                                                        {{range $ct := $.ControlTeams}}
+                                                                            <option value="{{$ct}}" {{if checkStringInListFunc $ct $controlPart.Teams}} selected {{end}}>{{$ct}}</option>
+                                                                        {{end}}
+                                                                    </select>  
+                                                                    <small class="form-text text-muted">예산에서 해당 구분에 속하는 팀들을 선택해주세요.</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    {{end}}
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col">
+                                                        <!-- 팀 추가 버튼 -->
+                                                        <input type="hidden" id="head{{$hIndex}}-control{{$cIndex}}-teamnum" name="head{{$hIndex}}-control{{$cIndex}}-teamnum" value="{{len $control.Parts}}">
+                                                        <span id="teamaddbtn" class="add float-right mt-2" onclick="addTeamSettingControlTeamFunc('{{$hIndex}}', '{{$cIndex}}', {{$.ControlTeams}});">팀</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {{end}}
+                                </div>
+                                <div class="row">
+                                    <div class="col-5">
+                                        <!-- Part / Sup 추가 버튼 -->
+                                        <input type="hidden" id="head{{$hIndex}}-deptnum" name="head{{$hIndex}}-deptnum" value="{{len (index $.TeamSetting.Departments $head)}}">
+                                        <input type="hidden" id="head{{$hIndex}}-controlnum" name="head{{$hIndex}}-controlnum" value="{{len (index $.TeamSetting.Controls $head)}}">
+                                        <span id="supaddbtn" class="add float-right mt-2" onclick="addTeamSettingControlFunc('{{$hIndex}}', {{$.ControlTeams}});">SUP</span>
+                                        <span id="partaddbtn" class="add float-right mr-2 mt-2" onclick="addTeamSettingPartFunc('{{$hIndex}}');">부서</span>
+                                    </div>
+                                    <div class="col-7"></div>
+                                </div>
+                            </div>
+                        </div>
+                    {{end}}
+                </div>
+
+                <div class="row">
+                    <div class="col-2">
+                        <!-- 본부 추가 버튼 -->
+                        <input type="hidden" name="headnum" id="headnum" value="{{len .TeamSetting.Headquarters}}">
+                        <span id="headquarteraddbtn" class="add float-right mt-2" onclick="addTeamSettingHeadFunc({{$.ControlTeams}});">본부</span>
+                    </div>
+                    <div class="col-10"></div>
+                </div>
+                
+                <div class="row-sm-1"></div>
+
+                <div class="row mx-auto pt-5" style="max-width: 55%;">
+                    <div class="col">
+                        <div class="pt-5 pb-3">
+                            <h5 class="section-heading text-muted">< 태스크별 팀 설정 ></h5>
+                        </div>
+                        {{range $index, $t := .Tasks}}
+                            {{$teams := index $.TeamSetting.Teams $t}}
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group">
+                                        <label class="text-muted" for="task{{$index}}">태스크</label>
+                                        <input type="text" name="task{{$index}}" id="task{{$index}}" class="form-control" value="{{$t}}" readonly>
+                                        <small class="form-text text-muted">예산에서 사용하는 태스크입니다.</small>
+                                    </div>
+                                </div>
+                                <div class="col-8">
+                                    <div class="form-group">
+                                        <label class="text-muted" for="team{{$index}}">팀</label>
+                                        <select name="team{{$index}}" id="team{{$index}}" class="form-control teamselect" multiple="multiple">
+                                            <!-- VFX 팀 리스트 -->
+                                            {{range $team := $.VFXTeams}}
+                                                <option value="{{$team}}" {{if checkStringInListFunc $team $teams}} selected {{end}}>{{$team}}</option>
+                                            {{end}}
+                                            <!-- CM 팀 리스트 -->
+                                            {{range $team := $.CMTeams}}
+                                                <option value="CM_{{$team}}" {{if checkStringInListFunc (printf "%s_%s" "CM" $team) $teams}} selected {{end}}>CM_{{$team}}</option>
+                                            {{end}}
+                                        </select>
+                                        <small class="form-text text-muted">태스크에 해당하는 팀을 선택해주세요.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+                        <input type="hidden" name="tasknum" id="tasknum" value="{{len .Tasks}}">
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="sutmit" class="btn btn-outline-danger">UPDATE</button>
+            </div>
+        </form>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/select2.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".teamselect").select2();
+    });
+</script>
+</html>
+{{end}}

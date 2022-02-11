@@ -1,0 +1,350 @@
+{{define "adminsetting"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-adminsetting" .}}
+    <div class="container-md p-5">
+        <form action="/adminsetting-submit" method="POST">
+            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-3">
+                    <h2 class="section-heading text-muted text-center">Admin Setting</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+
+                    <div class="pt-3 pb-3">
+                        <h5 class="section-heading text-muted">< VFX 부서 및 팀 설정 ></h5>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">Depts</label>
+                        <input type="text" name="vfxdepts" class="form-control" value="{{listToStringFunc .AdminSetting.VFXDepts false}}">
+                        <small class="form-text text-muted">VFX에 속하는 부서를 입력해주세요. 띄어쓰기로 구분하며 Shotgun의 팀 태그와 일치해야 합니다.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">Teams</label>
+                        <small class="form-text text-muted pb-3">VFX에 속하는 Dept(팀 태그) 각각에 해당하는 팀들입니다.<br>변경은 Shotgun에서 가능합니다.</small>
+                        {{range $vfxDept := .AdminSetting.VFXDepts}}
+                            {{$vfxteams := index $.AdminSetting.VFXTeams $vfxDept}}
+                            <div class="pb-2">
+                                <h6 class="section-heading text-muted"> - {{$vfxDept}}</h6>
+                                <div>
+                                {{range $vfxteams}}
+                                    <span class="tag badge badge-outline-darkmode">{{.}}</span>
+                                {{end}}
+                                </div>
+                            </div>
+                        {{end}}
+                    </div>
+
+                    <div class="pt-5 pb-3">
+                        <h5 class="section-heading text-muted">< CM 팀 설정 ></h5>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">Teams</label>
+                        <input type="text" name="cmteams" class="form-control" value="{{listToStringFunc .AdminSetting.CMTeams false}}">
+                        <small class="form-text text-muted">CM 본부에 속하는 팀을 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+
+                    <div class="pt-5 pb-3">
+                        <h5 class="section-heading text-muted">< 메일 설정 ></h5>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">프로젝트 발행일 메일 발송</label>
+                        <input type="text" name="gwidsforproject" class="form-control" value="{{listToStringFunc .AdminSetting.GWIDsForProject false}}">
+                        <small class="form-text text-muted">프로젝트 발행일에 메일을 발송할 그룹웨어 ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">벤더 발행일 메일 발송</label>
+                        <input type="text" name="gwids" class="form-control" value="{{listToStringFunc .AdminSetting.GWIDs false}}">
+                        <small class="form-text text-muted">벤더 발행일에 메일을 발송할 그룹웨어 ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+
+                </div>
+                <div class="col-sm-1"></div>
+                <div class="col">
+
+                    <div class="pt-3 pb-3">
+                        <h5 class="section-heading text-muted">< Project 설정 ></h5>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">Project Status</label>
+                        <div id="projectStatus">
+                            <!-- Project Status -->
+                            {{$statusnum := 0}}
+                            {{range $pstatus := .AdminSetting.ProjectStatus}}
+                            <div class="row pt-2">
+                                <div class="col">
+                                    <label class="text-muted">Status Name</label>
+                                    <input type="text" name="statusid{{$statusnum}}" class="form-control" value="{{$pstatus.ID}}">
+                                </div>
+                                <div class="col">
+                                    <label class="text-muted">Text</label>
+                                    <input class="jscolor{valueElement:'textcolor{{$statusnum}}'} btn border border-light w-100">
+                                </div>
+                                <div class="col">
+                                    <label class="text-muted">BG</label>
+                                    <input class="jscolor{valueElement:'bgcolor{{$statusnum}}'} btn border border-light w-100">
+                                </div>
+                            </div>
+                            <div class="row pt-2">
+                                <div class="col"></div>
+                                <div class="col">
+                                    <input id="textcolor{{$statusnum}}" name="textcolor{{$statusnum}}" type="text" class="form-control" value="{{$pstatus.TextColor}}">
+                                    <small class="form-text text-muted">Status 글자색</small>
+                                </div>
+                                <div class="col">
+                                    <input id="bgcolor{{$statusnum}}" name="bgcolor{{$statusnum}}" type="text" class="form-control" value="{{$pstatus.BGColor}}">
+                                    <small class="form-text text-muted">Status 배경색</small>
+                                </div>
+                            </div>
+                            {{$statusnum = addIntFunc $statusnum 1}}
+                            {{end}}
+                        </div>
+                        <div class="row">
+                            <input type="hidden" id="projectStatusNum" name="projectStatusNum" value="{{$statusnum}}">
+                            <div class="col">
+                                <span id="statusaddbtn" class="add float-right mt-2" onclick="addProjectStatusFunc();">+</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">태스크로 구분할 프로젝트</label>
+                        <input type="text" name="taskprojects" class="form-control" value="{{listToStringFunc .AdminSetting.TaskProjects false}}">
+                        <small class="form-text text-muted">태스크네임으로 프로젝트를 구분할 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">RND 프로젝트</label>
+                        <input type="text" name="rndprojects" class="form-control" value="{{listToStringFunc .AdminSetting.RNDProjects false}}">
+                        <small class="form-text text-muted">타임로그를 업데이트할 때 RND 프로젝트로 처리힐 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">ETC 프로젝트</label>
+                        <input type="text" name="etcprojects" class="form-control" value="{{listToStringFunc .AdminSetting.ETCProjects false}}">
+                        <small class="form-text text-muted">타임로그를 업데이트할 때 ETC 프로젝트로 처리힐 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+
+                    <div class="pt-5 pb-3">
+                        <h5 class="section-heading text-muted">< Shotgun 설정 ></h5>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">제외할 ID</label>
+                        <span class="badge badge-pill badge-danger float-right finger mt-1" data-toggle="modal" data-target="#modal-rmtimelogbyid" onclick="setRmTimelogByIDModalFunc(document.getElementById('sgexcludeid').value)">Clear</span>
+                        <input type="text" id="sgexcludeid" name="sgexcludeid" class="form-control" value="{{listToStringFunc .AdminSetting.SGExcludeID false}}">
+                        <small class="form-text text-muted">Shotgun에서 타임로그를 가져올 때 제외할 사용자 ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">제외할 프로젝트</label>
+                        <span class="badge badge-pill badge-danger float-right finger mt-1" data-toggle="modal" data-target="#modal-rmtimelogbyproject" onclick="setRmTimelogByProjectModalFunc(document.getElementById('sgexcludeprojects').value)">Clear</span>
+                        <input type="text" id="sgexcludeprojects" name="sgexcludeprojects" class="form-control" value="{{listToStringFunc .AdminSetting.SGExcludeProjects false}}">
+                        <small class="form-text text-muted">Shotgun에서 타임로그를 가져올 때 제외할 프로젝트를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">업데이트된 시간 &nbsp;&nbsp;&nbsp;{{changeDateFormatFunc .AdminSetting.SGUpdatedTime}}</label>
+                        <span class="badge badge-pill badge-danger finger mt-1 ml-2" data-toggle="modal" data-target="#modal-checkresettimelog" onclick="">Reset</span>
+                        <small class="form-text text-muted">Shotgun의 타임로그가 마지막으로 업데이트된 시간입니다.</small>
+                    </div>
+
+                </div>
+                <div class="col-sm-1"></div>
+                <div class="col">
+
+                    <div class="pt-3 pb-3">
+                        <h5 class="section-heading text-muted">< 결산 설정 ></h5>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">월별 상태</label>
+                        <div class="form-control">
+                            <div class="row">
+                                <div class="col-3">
+                                    <label class="text-muted">{{stringToDateFunc .BeforeLastMonthlyStatus.Date}}</label>
+                                </div>
+                                <div class="col">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="beforeLastMonthlyStatus1" name="beforeLastMonthlyStatus1" class="custom-control-input" value="true" {{ if .BeforeLastMonthlyStatus.Status }}checked{{end}}>
+                                        <label class="custom-control-label text-muted" for="beforeLastMonthlyStatus1">Yes</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="beforeLastmonthlystatus2" name="beforeLastMonthlyStatus1" class="custom-control-input" value="false" {{ if not .BeforeLastMonthlyStatus.Status }}checked{{end}}>
+                                        <label class="custom-control-label text-muted" for="beforeLastmonthlystatus2">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <label class="text-muted">{{stringToDateFunc .LastMonthlyStatus.Date}}</label>
+                                </div>
+                                <div class="col">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="lastMonthlyStatus1" name="lastMonthlyStatus1" class="custom-control-input" value="true" {{ if .LastMonthlyStatus.Status }}checked{{end}}>
+                                        <label class="custom-control-label text-muted" for="lastMonthlyStatus1">Yes</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="lastmonthlystatus2" name="lastMonthlyStatus1" class="custom-control-input" value="false" {{ if not .LastMonthlyStatus.Status }}checked{{end}}>
+                                        <label class="custom-control-label text-muted" for="lastmonthlystatus2">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-3">
+                                    <label class="text-muted">{{stringToDateFunc .CurMonthlyStatus.Date}}</label>
+                                </div>
+                                <div class="col">
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="curMonthlyStatus1" name="curMonthlyStatus1" class="custom-control-input" value="true" {{ if .CurMonthlyStatus.Status }}checked{{end}}>
+                                        <label class="custom-control-label text-muted" for="curMonthlyStatus1">Yes</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline">
+                                        <input type="radio" id="curmonthlystatus2" name="curMonthlyStatus1" class="custom-control-input" value="false" {{ if not .CurMonthlyStatus.Status }}checked{{end}}>
+                                        <label class="custom-control-label text-muted" for="curmonthlystatus2">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">결산이 완료되었으면 Yes로 설정해주세요. Yes로 설정되어 있으면 그 달의 타임로그는 업데이트되지 않습니다.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">VFX Supervisors</label>
+                        <input type="text" name="smsupervisorids" class="form-control" value="{{listToStringFunc .AdminSetting.SMSupervisorIDs false}}">
+                        <small class="form-text text-muted">수퍼바이저의 Shotgun ID를 입력해주세요. 띄어쓰기로 구분합니다.</small>
+                    </div>
+                    <div class="form-group">
+                        <label class="text-muted">끝난 프로젝트 처리 상태</label>
+                        <div class="pb-2">
+                            <label class="text-muted">{{stringToDateFunc .LastMonthlyStatus.Date}}</label>
+                            <div class="form-control">
+                                {{$lnum := 0}}
+                                {{range $lfts := .LastFTStatus}}
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="text-muted">{{$lfts.Project}}</label>
+                                    </div>
+                                    <div class="col">
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="lastFTStatus1{{$lnum}}" name="lastFTStatus{{$lnum}}" class="custom-control-input" value="{{$lfts.Project}}-{{$lfts.Status}}-false" {{ if not $lfts.Status }}checked{{end}}>
+                                            <label class="custom-control-label text-muted" for="lastFTStatus1{{$lnum}}">프로젝트로 처리</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="lastFTStatus2{{$lnum}}" name="lastFTStatus{{$lnum}}" class="custom-control-input" value="{{$lfts.Project}}-{{$lfts.Status}}-true" {{ if $lfts.Status }}checked{{end}}>
+                                            <label class="custom-control-label text-muted" for="lastFTStatus2{{$lnum}}">ETC로 처리</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{$lnum = addIntFunc $lnum 1}}
+                                {{end}}
+                                <input type="hidden" name="lastFTStatusNum" value="{{$lnum}}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-muted">{{stringToDateFunc .CurMonthlyStatus.Date}}</label>
+                            <div class="form-control">
+                                {{$cnum := 0}}
+                                {{range $cfts := .CurFTStatus}}
+                                <div class="row">
+                                    <div class="col-3">
+                                        <label class="text-muted">{{$cfts.Project}}</label>
+                                    </div>
+                                    <div class="col">
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="curFTStatus1{{$cnum}}" name="curFTStatus{{$cnum}}" class="custom-control-input" value="{{$cfts.Project}}-{{$cfts.Status}}-false" {{ if not $cfts.Status }}checked{{end}}>
+                                            <label class="custom-control-label text-muted" for="curFTStatus1{{$cnum}}">프로젝트로 처리</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="curFTStatus2{{$cnum}}" name="curFTStatus{{$cnum}}" class="custom-control-input" value="{{$cfts.Project}}-{{$cfts.Status}}-true" {{ if $cfts.Status }}checked{{end}}>
+                                            <label class="custom-control-label text-muted" for="curFTStatus2{{$cnum}}">ETC로 처리</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                {{$cnum = addIntFunc $cnum 1}}
+                                {{end}}
+                                <input type="hidden" name="curFTStatusNum" value="{{$cnum}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-5">
+                        <h5 class="section-heading text-muted">< 예산 설정 ></h5>
+                        <label class="pt-3 text-muted">[ 수퍼바이저 / 프로덕션 / 매니지먼트 팀 설정 ]</label>
+                    </div>
+
+                    <div class="form-group pt-3">
+                        <label class="text-muted">수퍼바이저 팀 설정</label>
+                        <select name="bgsupervisorteams" id="bgsupervisorteams" class="form-control teamselect" multiple="multiple">
+                            <!-- VFX 팀 리스트 -->
+                            {{range $teamlist := .AdminSetting.VFXTeams}}
+                                {{range $team := $teamlist}}
+                                    <option value="{{$team}}" {{if checkStringInListFunc $team $.AdminSetting.BGSupervisorTeams}} selected {{end}}>{{$team}}</option>
+                                {{end}}
+                            {{end}}
+                            <!-- CM 팀 리스트 -->
+                            {{range $team := .AdminSetting.CMTeams}}
+                                <option value="CM_{{$team}}" {{if checkStringInListFunc (printf "%s_%s" "CM" $team) $.AdminSetting.BGSupervisorTeams}} selected {{end}}>CM_{{$team}}</option>
+                            {{end}}
+                        </select>                        
+                        <small class="form-text text-muted">예산에서 사용할 수퍼바이저의 팀을 선택해주세요.</small>
+                    </div>
+
+                    <div class="form-group pt-3">
+                        <label class="text-muted">프로덕션 팀 설정</label>
+                        <select name="bgproductionteams" id="bgproductionteams" class="form-control teamselect" multiple="multiple">
+                            <!-- VFX 팀 리스트 -->
+                            {{range $teamlist := .AdminSetting.VFXTeams}}
+                                {{range $team := $teamlist}}
+                                    <option value="{{$team}}" {{if checkStringInListFunc $team $.AdminSetting.BGProductionTeams}} selected {{end}}>{{$team}}</option>
+                                {{end}}
+                            {{end}}
+                            <!-- CM 팀 리스트 -->
+                            {{range $team := .AdminSetting.CMTeams}}
+                                <option value="CM_{{$team}}" {{if checkStringInListFunc (printf "%s_%s" "CM" $team) $.AdminSetting.BGProductionTeams}} selected {{end}}>CM_{{$team}}</option>
+                            {{end}}
+                        </select>                        
+                        <small class="form-text text-muted">예산에서 사용할 프로덕션의 팀을 선택해주세요.</small>
+                    </div>
+
+                    <div class="form-group pt-3 pb-2">
+                        <label class="text-muted">매니지먼트 팀 설정</label>
+                        <select name="bgmanagementteams" id="bgmanagementteams" class="form-control teamselect" multiple="multiple">
+                            <!-- VFX 팀 리스트 -->
+                            {{range $teamlist := .AdminSetting.VFXTeams}}
+                                {{range $team := $teamlist}}
+                                    <option value="{{$team}}" {{if checkStringInListFunc $team $.AdminSetting.BGManagementTeams}} selected {{end}}>{{$team}}</option>
+                                {{end}}
+                            {{end}}
+                            <!-- CM 팀 리스트 -->
+                            {{range $team := .AdminSetting.CMTeams}}
+                                <option value="CM_{{$team}}" {{if checkStringInListFunc (printf "%s_%s" "CM" $team) $.AdminSetting.BGManagementTeams}} selected {{end}}>CM_{{$team}}</option>
+                            {{end}}
+                        </select>                        
+                        <small class="form-text text-muted">예산에서 사용할 매니지먼트의 팀을 선택해주세요.</small>
+                    </div>
+
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="sutmit" class="btn btn-outline-danger">UPDATE</button>
+            </div>
+        </form>
+    </div>
+{{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/jscolor.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/select2.min.js"></script>
+
+<script>
+$("#statusaddbtn").click(function(){
+    jscolor.installByClassName('jscolor')
+})
+</script>
+
+<script>
+    $(document).ready(function(){
+        $(".teamselect").select2();
+    });
+</script>
+
+</html>
+{{end}}

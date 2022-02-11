@@ -1,0 +1,298 @@
+{{define "add-bgproject"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container-md p-5">
+        <form action="/addbgproject-submit" method="POST" onsubmit="return addBGProjectPageBlankCheckFunc(true)">
+            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-5">
+                    <h2 class="section-heading text-muted text-center">Add Project - 예산</h2>
+                </div>
+            </div>
+            <div class="col">
+                <div class="row mx-auto pt-3 pb-2" style="max-width: 50%;">
+                    <div class="col">
+                        <div class="ml-5 pt-3 pb-3">
+                            <h5 class="section-heading text-muted">< 프로젝트 기본 정보 ></h5>
+                        </div>
+                        <div class="row pb-2">
+                            <div class="col form-group">
+                                <label class="text-muted">Project ID</label>
+                                <input type="text" class="form-control" id="id" name="id">
+                                <small class="form-text text-muted">프로젝트 영문명 / 영문 및 숫자만 입력해주세요.</small>
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">프로젝트 한글명</label>
+                                <input type="text" class="form-control" id="name" name="name">
+                            </div>
+                        </div>
+                        <div class="row pb-3">
+                            <div class="col form-group">
+                                <label class="text-muted">작업 예상 시작일</label>
+                                <input type="month" class="form-control" id="startdate" name="startdate" max="9999-12">
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">작업 예상 마감일</label>
+                                <input type="month" class="form-control" id="enddate" name="enddate" max="9999-12">
+                            </div>
+                        </div>
+                        <div class="row pb-3">
+                            <div class="col form-group">
+                                <label class="text-muted">감독</label>
+                                <input type="text" class="form-control" id="directorname" name="directorname">
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">제작사</label>
+                                <input type="text" class="form-control" id="producername" name="producername">
+                            </div>
+                        </div>
+                        <div class="row pb-3">
+                            <div class="col form-group">
+                                <label class="text-muted">Status</label>
+                                <select name="status" id="status" class="form-control custom-select left-radius right-radius">
+                                    <option value="true">계약 완료</option>
+                                    <option value="false">사전 검토</option>
+                                </select>
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">Type</label>
+                                <select name="type" id="type" class="form-control custom-select left-radius right-radius">
+                                    <option value="movie">영화</option>
+                                    <option value="drama">드라마</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row-sm-1"></div>
+                <div class="row pt-3 pb-3 mx-auto" style="max-width: 95%;">
+                    <div class="col">
+                        <div class="row pt-3 pb-3">
+                            <div class="ml-5">
+                                <h5 class="section-heading text-muted">< 프로젝트 예산안 정보 ></h5>
+                            </div>
+                        </div>
+                        <div class="row pt-3 pb-2">
+                            <div class="col form-group">
+                                <label class="text-muted">예산안 타입</label>
+                                <input type="text" class="form-control" id="bgtype" name="bgtype">
+                            </div>
+                            <div class="col form-group">
+                                <label class="text-muted">계약일</label>
+                                <input type="date" class="form-control" id="bgcontractdate" name="bgcontractdate" max="9999-12-31">
+                            </div>
+                            <div class="col form-group" style="left: 30px;">
+                                <div class="row">
+                                    <label class="text-muted">실행 예산 확정</label>
+                                </div>
+                                <div class="row pt-2">
+                                    <div class="custom-control custom-radio custom-control-inline" style="padding-left: 35px;">
+                                        <input type="radio" id="bgmaintypestatus1" name="bgmaintypestatus" class="custom-control-input" value="true">
+                                        <label class="custom-control-label text-muted" for="bgmaintypestatus1">Yes</label>
+                                    </div>
+                                    <div class="custom-control custom-radio custom-control-inline" style="padding-left: 35px;">
+                                        <input type="radio" id="bgmaintypestatus2" name="bgmaintypestatus" class="custom-control-input" value="false">
+                                        <label class="custom-control-label text-muted" for="bgmaintypestatus2">No</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pb-2">
+                            <div class="form-group col">
+                                <label class="text-muted">제안 견적</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="bgproposal" name="bgproposal" onkeyup="calNegoRatioFunc('');">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                            <div class="form-group col">
+                                <label class="text-muted">계약 결정액</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="bgdecision" name="bgdecision" onkeyup="calNegoRatioFunc('');">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                            <div class="form-group col">
+                                <label class="text-muted">네고율</label>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="bgnegoratio" name="bgnegoratio" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" style="background-color: #1C1C1C; color: #A7A59C; border: 1px solid #A7A59C;">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row pb-2">
+                            <div class="form-group col">
+                                <label class="text-muted">계약 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="bgcontractcuts" name="bgcontractcuts">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                            <div class="form-group col">
+                                <label class="text-muted">작업 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="bgworkingcuts" name="bgworkingcuts">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                            <div class="col"></div>
+                        </div>
+                        <div class="row pt-3 pb-3">
+                            <div class="ml-5">
+                                <h5 class="section-heading text-muted">< 예산 지출 기입 ></h5>
+                            </div>
+                        </div>
+                        <div class="row pb-2">
+                            <div class="form-group col">
+                                <label class="text-muted">Retake율</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="bgretakeratio" name="bgretakeratio" step="0.01" max="100">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col">
+                                <label class="text-muted">진행비율</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="bgprogressratio" name="bgprogressratio" step="0.01" max="100">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col">
+                                <label class="text-muted">외주비율</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="bgvendorratio" name="bgvendorratio" step="0.01" max="100">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-1"></div>
+                    <div class="col">
+                        <div class="row pt-3 pb-3">
+                            <div class="col-sm-9">
+                                <div class="ml-5">
+                                    <h5 class="section-heading text-muted">< 수퍼바이저 / 프로덕션 / 매니지먼트 기입 ></h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-1 mt-1">
+                                <input type="hidden" name="bgsupervisornum" id="bgsupervisornum" value="1">
+                                <span id="bgsupervisoraddbtn" class="add float-right" onclick="addBGSupervisorSettingFunc({{$.Supervisor}}, '');">SUP</span>
+                            </div>
+                            <div class="col-sm-1 mt-1">
+                                <input type="hidden" name="bgproductionnum" id="bgproductionnum" value="1">
+                                <span id="bgproductionaddbtn" class="add float-right" onclick="addBGProductionSettingFunc({{$.Production}}, '');">PROD</span>
+                            </div>
+                            <div class="col-sm-1 mt-1">
+                                <input type="hidden" name="bgmanagementnum" id="bgmanagementnum" value="1">
+                                <span id="bgmanagementaddbtn" class="add float-right" onclick="addBGManagementSettingFunc({{$.Management}}, '');">MNG</span>
+                            </div>
+                        </div>
+                        <div id="bgsupervisor">
+                            <div class="row pt-3 pb-1">
+                                <div class="col form-group">
+                                    <label class="text-muted">수퍼바이저</label>
+                                    <select name="supervisor0" id="supervisor0" class="form-control custom-select left-radius right-radius">
+                                        <option value=""></option>
+                                        {{range $sup := .Supervisor}}
+                                            <option value="{{$sup.ID}}">{{$sup.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">업무</label>
+                                    <input type="text" class="form-control" id="supervisor0-bgmanagementwork" name="supervisor0-bgmanagementwork">
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">참여 기간</label>
+                                    <input type="number" class="form-control" id="supervisor0-bgmanagementperiod" name="supervisor0-bgmanagementperiod">
+                                    <small id="supervisor0-bgmanagementperiod-label" class="form-text text-muted">숫자만 입력해주세요.</small>
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">참여 기간 퍼센티지</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="supervisor0-bgmanagementratio" name="supervisor0-bgmanagementratio" step="0.01" max="100">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="bgproduction">
+                            <div class="row pt-5 pb-1">
+                                <div class="col form-group">
+                                    <label class="text-muted">프로덕션</label>
+                                    <select name="production0" id="production0" class="form-control custom-select left-radius right-radius">
+                                        <option value=""></option>
+                                        {{range $prod := .Production}}
+                                            <option value="{{$prod.ID}}">{{$prod.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">업무</label>
+                                    <input type="text" class="form-control" id="production0-bgmanagementwork" name="production0-bgmanagementwork">
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">참여 기간</label>
+                                    <input type="number" class="form-control" id="production0-bgmanagementperiod" name="production0-bgmanagementperiod">
+                                    <small id="production0-bgmanagementperiod-label" class="form-text text-muted">숫자만 입력해주세요.</small>
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">참여 기간 퍼센티지</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="production0-bgmanagementratio" name="production0-bgmanagementratio" step="0.01" max="100">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="bgmanagement">
+                            <div class="row pt-5 pb-1">
+                                <div class="col form-group">
+                                    <label class="text-muted">매니지먼트</label>
+                                    <select name="management0" id="management0" class="form-control custom-select left-radius right-radius">
+                                        <option value=""></option>
+                                        {{range $mng := .Management}}
+                                            <option value="{{$mng.ID}}">{{$mng.Name}}</option>
+                                        {{end}}
+                                    </select>
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">업무</label>
+                                    <input type="text" class="form-control" id="management0-bgmanagementwork" name="management0-bgmanagementwork">
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">참여 기간</label>
+                                    <input type="number" class="form-control" id="management0-bgmanagementperiod" name="management0-bgmanagementperiod">
+                                    <small id="management0-bgmanagementperiod-label" class="form-text text-muted">숫자만 입력해주세요.</small>
+                                </div>
+                                <div class="col form-group">
+                                    <label class="text-muted">참여 기간 퍼센티지</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="management0-bgmanagementratio" name="management0-bgmanagementratio" step="0.01" max="100">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" style="background-color: #1C1C1C!important; color: #A7A59C!important; border: 1px solid #A7A59C!important;">%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="submit" class="btn btn-outline-warning">ADD</button>
+            </div>
+        </form>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

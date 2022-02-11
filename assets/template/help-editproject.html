@@ -1,0 +1,217 @@
+{{define "help-editproject"}}
+    <!-- Project Edit Help -->
+    <div class="p-5">
+        <h3 class="pt-2 pb-4 text-darkmode text-center">Edit Project - 결산</h3>
+        <div class="row">
+            <div class="mx-auto" style="width: 50%;">
+                <div class="">
+                    <h5 class="pb-3 text-darkmode"><기본 정보></h5>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">Project ID</label>
+                        <input type="text" class="form-control" id="id" name="id" placeholder="ID" value="MUS" readonly>
+                        <small class="form-text text-muted">프로젝트 영문명 / 영문 및 숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">프로젝트 한글명</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="Name" value="유열의 음악앨범">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 시작일</label>
+                                <input type="month" class="form-control" id="startdate" name="startdate" placeholder="yyyy-MM" value="2020-08">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 마감일</label>
+                                <input type="month" class="form-control" id="enddate" name="enddate" placeholder="yyyy-MM" value="2021-01">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">총 매출</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="payment" name="payment" placeholder="10,000,000" value="10,000,000">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">계약일</label>
+                                <input type="date" class="form-control" id="paymentdate" name="paymentdate" value="2021-01-31" max="9999-12-31">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <span id="paymentaddbtn" class="add float-right">총 매출 추가</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">감독</label>
+                                <input type="text" class="form-control" id="directorname" name="directorname" placeholder="감독 이름" value="">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">제작사</label>
+                                <input type="text" class="form-control" id="producername" name="producername" placeholder="제작사 이름" value="">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">계약 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="contractcuts" name="contractcuts" value="300">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="workingcuts" name="workingcuts" value="250">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    프로젝트의 기본 정보를 수정할 수 있습니다.<br>
+                    <br>
+                    • 프로젝트의 ID는 변경할 수 없습니다.<br>
+                    • 프로젝트의 한글명, 작업 기간, 총 매출, 감독, 제작사, 계약 컷수, 작업 컷수를 수정할 수 있습니다.<br>
+                    • <span id="paymentaddbtn" class="add">총 매출 추가</span> : 총 매출 정보(총 매출, 계약일)를 추가할 수 있습니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-5">
+            <div class="mx-auto" style="width: 50%;">
+                <div class="">
+                    <h5 class="pb-4 text-darkmode"><정산 완료된 프로젝트 처리></h5>
+                    <div class="row">
+                        <div class="col">
+                            <div class="custom-control custom-checkbox pb-2">
+                                <input type="checkbox" class="custom-control-input" id="isfinished" name="isfinished">
+                                <label class="custom-control-label text-muted" for="isfinished">정산 완료된 프로젝트</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-1"></div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" value="true" disabled>
+                            <label class="custom-control-label text-muted">월별 합산 값으로 저장</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" class="custom-control-input" value="false" disabled>
+                            <label class="custom-control-label text-muted">최종 입력 값으로 저장</label>
+                        </div>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">총 내부비용</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="totalamount" name="totalamount" placeholder="10,000,000" value="" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">내부인건비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="laborcost" name="laborcost" placeholder="10,000,000" value="" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">진행비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="progresscost" name="progresscost" placeholder="10,000,000" value="" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">구매비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="purchasecost" name="purchasecost" placeholder="10,000,000" value="" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">경관실 입력 데이터</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="difference" name="difference" placeholder="10,000,000" value="" disabled>
+                        <small class="form-text text-muted">공통 노무비와 공통 경비를 합산한 금액을 적어주세요. 숫자만 입력해주세요.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    프로젝트가 정산 완료되었을 때 설정하는 부분입니다.<br>
+                    <br>
+                    • 정산 완료된 프로젝트를 체크할 경우 옵션들이 활성화됩니다.<br>
+                    • 월별 합산 값으로 저장 : 자동으로 월별로 저장된 내부 인건비, 진행비, 구매비를 토대로 정산됩니다.<br>
+                    • 최종 입력 값으로 저장 : 입력한 금액으로 정산되며 월별로 저장된 내부 인건비, 진행비, 구매비는 초기화됩니다.<br>
+                    • 경관실 입력 데이터 : 프로젝트 재무관리 툴로 정산한 금액과 경영관리실에서 정산한 금액의 차액을 입력합니다.<br>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-5">
+            <div class="mx-auto" style="width: 60%;">
+                <div class="">
+                    <h5 class="pb-4 text-darkmode"><월별 지출 내역 입력></h5>
+                    <table name="projecttable" id="projecttable" class="table table-sm text-center table-hover text-white">
+                        <thead>
+                            <tr>
+                                <th class="border-top-white border-bottom-white border-right-gray">날짜</th>
+                                <th class="border-top-white border-bottom-white border-right-white">Status</th>
+                                <th class="border-top-white border-bottom-white border-right-white">월별 매출</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">진행비</th>
+                                <th class="border-top-white border-bottom-white">구매비</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="border-right-gray">2020년 08월</td>
+                                <td class="border-right-white">
+                                   <select class="form-control">
+                                       <option value="" selected></option>
+                                       <option value="RDY">RDY</option>
+                                       <option value="FIN">FIN</option>
+                                   </select>
+                                </td>
+                                <td class="input-group border-right-white">
+                                    <input type="text" inputmode="numeric" class="form-control" value="5,000,000" readonly>
+                                    <div class="input-group-prepend">
+                                        <span class="btn-sm btn-darkmode finger">...</span>
+                                    </div>
+                                </td>
+                                <td class="border-right-gray">
+                                    <input type="text" inputmode="numeric" class="form-control" value="2,000,000">
+                                </td>
+                                <td>
+                                    <div class="input-group">
+                                        <input type="text" inputmode="numeric" class="form-control" value="300,000" readonly>
+                                        <div class="input-group-prepend">
+                                            <span class="btn-sm btn-darkmode finger">...</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="row pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    프로젝트의 월별 지출 내역을 입력하는 부분입니다.<br>
+                    <br>
+                    • 프로젝트의 작업 기간에 맞게 테이블이 생성됩니다.<br><br>
+                    • 월별 매출 <span class="btn-sm btn-darkmode finger">...</span> : 월별 매출의 세부 내역을 입력하는 창이 나타납니다. 금액, 세금계산서 발행일, 입금일, 입금여부를 입력합니다.<br><br>
+                    • 진행비 : 월별 진행비의 금액을 입력합니다.<br><br>
+                    • 구매비 <span class="btn-sm btn-darkmode finger">...</span> : 구매비의 세부 내역을 입력하는 창이 나타납니다. 업체명, 내역, 금액을 입력합니다.<br>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}

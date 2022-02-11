@@ -1,0 +1,236 @@
+{{define "edit-vendor"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container p-5" style="max-width: 63%">
+        <form action="/editvendor-submit" method="POST" onsubmit="return checkAddVendorPageFunc()">
+            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-5">
+                    <h2 class="section-heading text-muted text-center">Edit Vendor</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="ml-5 pt-3 pb-3">
+                    <h5 class="section-heading text-muted"><필수 정보></h5>
+                </div>
+            </div>
+            <input type="hidden" id="id" name="id" value="{{.Vendor.ID.Hex}}">
+            <input type="hidden" id="isfinished" name="isfinished" value="{{.IsFinished}}">
+            <div class="row">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">프로젝트</label>
+                        <select name="project" id="project" class="form-control projectsearch">
+                            <option value=""></option>
+                            {{range $project := .ProjectList}}
+                                <option value="{{$project.ID}}" {{if eq $project.ID $.Vendor.Project}}selected{{end}}>{{$project.Name}}</option>
+                            {{end}}
+                        </select>
+                        <small class="form-text text-muted">현재 저장된 프로젝트 목록입니다. 추가하려는 프로젝트가 없으면 먼저 프로젝트를 추가해주세요.</small>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">벤더명</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{.Vendor.Name}}">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">총 비용</label>
+                        {{$tmp := decryptCostFunc .Vendor.Expenses true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="expenses" name="expenses" value="{{$tmp}}">
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">계약일</label>
+                        <input type="date" class="form-control" id="date" name="date" value="{{.Vendor.Date}}" max="9999-12-31">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="ml-5 pt-3 pb-3">
+                    <h5 class="section-heading text-muted"><부가 정보></h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">컷수</label>
+                        <input type="number" class="form-control" id="cuts" name="cuts" {{if ne .Vendor.Cuts 0}} value="{{.Vendor.Cuts}}" {{end}}>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">태스크</label>
+                        <input type="text" class="form-control" id="tasks" name="tasks" value="{{listToStringFunc .Vendor.Tasks true}}">
+                        <small class="form-text text-muted">공백없이 ","로 구분하여 적어주세요.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="ml-5 pt-3 pb-3">
+                    <h5 class="section-heading text-muted"><금액 정보></h5>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">계약금</label>
+                        {{$tmp := decryptCostFunc .Vendor.Downpayment.Expenses true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="downpayment" name="downpayment" value="{{$tmp}}">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">세금 계산서 발행일</label>
+                        <input type="date" class="form-control" id="downpaymentdate" name="downpaymentdate" value="{{.Vendor.Downpayment.Date}}" max="9999-12-31">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">지급일</label>
+                        <input type="date" class="form-control" id="downpaymentpayeddate" name="downpaymentpayeddate" value="{{.Vendor.Downpayment.PayedDate}}" max="9999-12-31">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="row mt-4 pt-2 pb-2">
+                        <div class="col-5">
+                            <label class="text-muted">지급 여부</label>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="downpaymentstatus1" name="downpaymentstatus" class="custom-control-input" value="true" {{if eq .Vendor.Downpayment.Status true}}checked{{end}}>
+                                    <label class="custom-control-label text-muted" for="downpaymentstatus1">Yes</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="downpaymentstatus2" name="downpaymentstatus" class="custom-control-input" value="false" {{if eq .Vendor.Downpayment.Status false}}checked{{end}}>
+                                    <label class="custom-control-label text-muted" for="downpaymentstatus2">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="addmediumplating">
+                <!-- 중도금 추가하는 곳 -->
+                {{range $n, $mp := .Vendor.MediumPlating}}
+                    <div class="row pt-2">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">중도금{{addIntFunc $n 1}}</label>
+                                {{$tmp := decryptCostFunc $mp.Expenses true}}
+                                {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                <input type="text" inputmode="numeric" class="form-control" id="mediumplating{{$n}}" name="mediumplating{{$n}}" value="{{$tmp}}">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">세금 계산서 발행일</label>
+                                <input type="date" class="form-control" id="mediumplatingdate{{$n}}" name="mediumplatingdate{{$n}}" value="{{$mp.Date}}" max="9999-12-31">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">지급일</label>
+                                <input type="date" class="form-control" id="mediumplatingpayeddate{{$n}}" name="mediumplatingpayeddate{{$n}}" value="{{$mp.PayedDate}}" max="9999-12-31">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="row mt-4 pt-2 pb-2">
+                                <div class="col-5">
+                                    <label class="text-muted">지급 여부</label>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="mediumplatingstatus1{{$n}}" name="mediumplatingstatus{{$n}}" class="custom-control-input" value="true" {{if eq $mp.Status true}}checked{{end}}>
+                                            <label class="custom-control-label text-muted" for="mediumplatingstatus1{{$n}}">Yes</label>
+                                        </div>
+                                        <div class="custom-control custom-radio custom-control-inline">
+                                            <input type="radio" id="mediumplatingstatus2{{$n}}" name="mediumplatingstatus{{$n}}" class="custom-control-input" value="false" {{if eq $mp.Status false}}checked{{end}}>
+                                            <label class="custom-control-label text-muted" for="mediumplatingstatus2{{$n}}">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {{end}}
+            </div>
+            <div class="row">
+                <input type="hidden" id="mediumplatingNum" name="mediumplatingNum" value="{{len .Vendor.MediumPlating}}">
+                <div class="col">
+                    <span id="mediumplatingaddbtn" class="add float-right mt-2" onclick="addMediumPlatingFunc();">중도금 추가</span>
+                </div>
+            </div>
+            <div class="row pt-2">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">잔금</label>
+                        {{$tmp := decryptCostFunc .Vendor.Balance.Expenses true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="balance" name="balance" value="{{$tmp}}">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">세금 계산서 발행일</label>
+                        <input type="date" class="form-control" id="balancedate" name="balancedate" value="{{.Vendor.Balance.Date}}" max="9999-12-31">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">지급일</label>
+                        <input type="date" class="form-control" id="balancepayeddate" name="balancepayeddate" value="{{.Vendor.Balance.PayedDate}}" max="9999-12-31">
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="row mt-4 pt-2 pb-2">
+                        <div class="col-5">
+                            <label class="text-muted">지급 여부</label>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="balancestatus1" name="balancestatus" class="custom-control-input" value="true" {{if eq .Vendor.Balance.Status true}}checked{{end}}>
+                                    <label class="custom-control-label text-muted" for="balancestatus1">Yes</label>
+                                </div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="balancestatus2" name="balancestatus" class="custom-control-input" value="false" {{if eq .Vendor.Balance.Status false}}checked{{end}}>
+                                    <label class="custom-control-label text-muted" for="balancestatus2">No</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="submit" class="btn btn-outline-warning">Edit</button>
+            </div>
+        </form>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".projectsearch").select2();
+    });
+</script>
+
+</html>
+{{end}}

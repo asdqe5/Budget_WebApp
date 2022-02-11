@@ -1,0 +1,218 @@
+{{define "help"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    
+    <div class="container-md">
+        <div class="row">
+            <div class="col-2 border rounded pt-3 sidebar">
+                <nav id="help-navbar" class="navbar">
+                    <nav class="nav flex-column">
+                        <!-- Basic 탭 -->
+                        <nav class="nav flex-column">
+                            <a class="nav-link font-weight-bold" href="#help-basic">Basic</a>
+                            <nav class="nav flex-column">
+                                <a class="nav-link ml-3" href="#help-toolbar">Toolbar</a>
+                                <a class="nav-link ml-3" href="#help-profile">Profile</a>
+                            </nav>
+                        </nav>
+        
+                        <!-- Timelog 탭 -->
+                        <nav class="nav flex-column">
+                            <a class="nav-link font-weight-bold" href="#help-timelog">Timelog</a>
+                        </nav>
+
+                        {{if gt .Token.AccessLevel 1}}
+                            <!-- 결산 탭 -->
+                            <nav class="nav flex-column">
+                                <a class="nav-link font-weight-bold" href="#help-sm">결산</a>
+                                <nav class="nav flex-column">
+                                    <a class="nav-link ml-3" href="#help-smpaymentstatus">매출 현황</a>
+                                    <a class="nav-link ml-3" href="#help-smvendorstatus">외주 현황</a>
+                                    <a class="nav-link ml-3" href="#help-smtotalstatus">Total 현황</a>
+                                    {{if eq $.Token.AccessLevel 4}}
+                                        <a class="nav-link ml-3" href="#help-smdetaillaborcost">세부 인건비</a>
+                                        <a class="nav-link ml-3" href="#help-smtotallaborcost">Total 인건비</a>
+                                    {{end}}
+                                </nav>
+                            </nav>
+
+                            <!-- Admin 탭 -->
+                            <nav class="nav flex-column">
+                                <a class="nav-link font-weight-bold text-danger" href="#help-admin">Admin</a>
+                                <nav class="nav flex-column">
+                                    {{if eq $.Token.AccessLevel 4}}
+                                        <a class="nav-link ml-3" href="#help-users">Users</a>
+                                        <a class="nav-link ml-3" href="#help-artists">Artists</a>
+                                        <a class="nav-link ml-3" href="#help-suptimelogs">Timelogs_SUP</a>
+                                    {{end}}
+                                    <a class="nav-link ml-3" href="#help-projects">Projects_결산</a>
+                                    {{if ge $.Token.AccessLevel 3}}
+                                        <a class="nav-link ml-5" href="#help-editproject">Edit Project - 결산</a>
+                                    {{end}}
+                                    <a class="nav-link ml-3" href="#help-vendors">Vendors</a>
+                                    {{if ge $.Token.AccessLevel 3}}
+                                        <a class="nav-link ml-5" href="#help-editvendor">Edit Vendor</a>
+                                    {{end}}
+                                    {{if eq $.Token.AccessLevel 4}}
+                                        <a class="nav-link ml-3" href="#help-adminsetting">Admin Setting</a>
+                                    {{end}}
+                                </nav>
+                            </nav>
+                        {{end}}
+                    </nav>
+                </nav>
+            </div>
+    
+            <div class="col">
+                <div data-spy="scroll" data-target="#help-navbar" data-offset="0">
+                    <!-- Basic 탭 -->
+                    <div class="p-5 text-center text-muted help-darkmode" id="help-basic">
+                        <h4 class="text-darkmode pb-4">BUDGET</h4>
+                        <p class="h6">
+                            <div class="p-1 font-weight-bold">
+                                BUDGET은 프로젝트 재무관리 툴입니다.
+                            </div>
+                            <div class="p-1 font-weight-bold">
+                                웹 기반의 툴이며 아티스트, 타임로그, 프로젝트 정보들을 관리하여,
+                            </div>
+                            <div class="p-1 font-weight-bold">
+                                저장된 정보들을 기반으로 프로젝트 결산과 예산의 재무를 확인 및 관리할 수 있습니다.
+                            </div>
+                        </p>
+                    </div>
+                    <!-- Basic 탭 - Toolbar -->
+                    <div class="bg-darklight" id="help-toolbar">
+                        {{template "help-toolbar" .}}
+                    </div>
+                    <!-- Basic 탭 - Profile -->
+                    <div class="text-muted" id="help-profile">
+                        {{template "help-profile" .}}
+                    </div>
+                    
+                    <!-- Timelog 탭 -->
+                    <div class="bg-darklight" id="help-timelog">
+                        {{template "help-timelog" .}}
+                    </div>
+
+                    {{if gt .Token.AccessLevel 1}}
+                        <!-- 결산 탭 -->
+                        <div class="p-5 text-center text-muted help-darkmode" id="help-sm">
+                            <h4 class="text-darkmode pb-4">결산</h4>
+                            <p class="h6">
+                                <div class="p-1 font-weight-bold">
+                                    결산과 관련된 매출 현황, 지출 현황, 인건비 내역을 월별로 확인할 수 있습니다.
+                                </div>
+                            </p>
+                        </div>
+
+                        <!-- 결산 탭 - 매출 현황 -->
+                        <div class="bg-darklight" id="help-smpaymentstatus">
+                            {{template "help-smpaymentstatus" .}}
+                        </div>
+
+                        <!-- 결산 탭 - 외주 현황 -->
+                        <div class="text-muted" id="help-smvendorstatus">
+                            {{template "help-smvendorstatus" .}}
+                        </div>
+
+                        <!-- 결산 탭 - Total 현황 -->
+                        <div class="bg-darklight" id="help-smtotalstatus">
+                            {{template "help-smtotalstatus" .}}
+                        </div>
+
+                        {{if eq $.Token.AccessLevel 4}}
+                            <!-- 결산 탭 - 세부 인건비 -->
+                            <div class="text-muted" id="help-smdetaillaborcost">
+                                {{template "help-smdetaillaborcost" .}}
+                            </div>
+
+                            <!-- 결산 탭 - Total 인건비 -->
+                            <div class="bg-darklight" id="help-smtotallaborcost">
+                                {{template "help-smtotallaborcost" .}}
+                            </div>
+                        {{end}}
+
+                        <!-- Admin 탭 -->
+                        <div class="p-5 text-center text-muted help-darkmode" id="help-admin">
+                            <h4 class="text-darkmode pb-4">Admin</h4>
+                            <p class="h6">
+                                <div class="p-1 font-weight-bold">
+                                    admin 권한을 가지고 있으면 사용자, 아티스트 정보 등을 확인 및 관리할 수 있습니다.
+                                </div>
+                                <div class="p-1 font-weight-bold">
+                                    또한 Admin Setting에서 프로젝트 재무관리 툴을 유연하게 사용할 수 있도록 설정할 수 있습니다.
+                                </div>
+                            </p>
+                        </div>
+
+                        {{if eq .Token.AccessLevel 4}}
+                            <!-- Admin 탭 - Users -->
+                            <div class="bg-darklight" id="help-users">
+                                {{template "help-users" .}}
+                            </div>
+
+                            <!-- Admin 탭 - Artists -->
+                            <div class="text-muted" id="help-artists">
+                                {{template "help-artists" .}}
+                            </div>
+
+                            <div class="bg-darklight" id="help-suptimelogs">
+                                {{template "help-suptimelogs" .}}
+                            </div>
+                        {{end}}
+
+                        <!-- Admin 탭 - Projects -->
+                        <div class="text-muted" id="help-projects">
+                            {{template "help-projects" .}}
+                        </div>
+
+                        {{if ge .Token.AccessLevel 3}}
+                            <!-- Admin 탭 - Projects - Edit -->
+                            <div class="bg-darklight" id="help-editproject">
+                                {{template "help-editproject" .}}
+                            </div>
+                        {{end}}
+
+                        <!-- Admin 탭 - Vendors -->
+                        <div class="text-muted" id="help-vendors">
+                            {{template "help-vendors" .}}
+                        </div>
+                        
+                        {{if ge .Token.AccessLevel 3}}
+                            <!-- Admin 탭 - Vendors - Edit -->
+                            <div class="bg-darklight" id="help-editvendor">
+                                {{template "help-editvendor" .}}
+                            </div>
+                        {{end}}
+                        
+                        {{if eq .Token.AccessLevel 4}}
+                            <!-- Admin 탭 - Admin Setting -->
+                            <div class="text-muted" id="help-adminsetting">
+                                {{template "help-adminsetting" .}}
+                            </div>
+                        {{end}}
+                    {{end}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{template "footer"}}
+</body>
+<!-- add javascript -->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/jscolor.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap-toggle.min.js"></script>
+<script src="/assets/js/select2.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".projectsearch").select2();
+    });
+</script>
+
+</html>
+{{end}}

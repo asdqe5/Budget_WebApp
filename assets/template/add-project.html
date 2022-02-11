@@ -1,0 +1,128 @@
+{{define "add-project"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container-md p-5">
+        <form action="/addproject-submit" method="POST" onsubmit="return addProjectPageBlankCheckFunc(true)">
+            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-5">
+                    <h2 class="section-heading text-muted text-center">Add Project - 결산</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">Project ID</label>
+                        <input type="text" class="form-control" id="id" name="id">
+                        <small class="form-text text-muted">프로젝트 영문명 / 영문 및 숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">프로젝트 한글명</label>
+                        <input type="text" class="form-control" id="name" name="name">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 시작일</label>
+                                <input type="month" class="form-control" id="startdate" name="startdate" max="9999-12">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 마감일</label>
+                                <input type="month" class="form-control" id="enddate" name="enddate" max="9999-12">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">총 매출</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="payment0" name="payment0">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">계약일</label>
+                                <input type="date" class="form-control" id="paymentdate0" name="paymentdate0" max="9999-12-31">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">감독</label>
+                                <input type="text" class="form-control" id="directorname" name="directorname">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">제작사</label>
+                                <input type="text" class="form-control" id="producername" name="producername">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">계약 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="contractcuts" name="contractcuts">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="workingcuts" name="workingcuts">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1"></div>
+                <div class="col">
+                    <div class="custom-control custom-checkbox pb-2">
+                        <input type="checkbox" class="custom-control-input" id="isfinished" name="isfinished" onclick="checkIsFinishedInAddFunc()">
+                        <label class="custom-control-label text-muted" for="isfinished">정산 완료된 프로젝트 추가</label>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">총 내부비용</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="totalamount" name="totalamount" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">내부인건비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="laborcost" name="laborcost" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">진행비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="progresscost" name="progresscost" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">구매비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="purchasecost" name="purchasecost" disabled>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">경관실 입력 데이터</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="difference" name="difference" disabled>
+                        <small class="form-text text-muted">공통 노무비와 공통 경비를 합산한 금액을 적어주세요. 숫자만 입력 가능합니다.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-5">
+                <button type="submit" class="btn btn-outline-warning">ADD</button>
+            </div>
+        </form>
+    </div>           
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

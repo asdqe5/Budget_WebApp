@@ -1,0 +1,515 @@
+{{define "vendors"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-vendor" .}}
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <form action="/searchvendors" method="POST">
+            <div class="d-flex pb-3">
+                <div class="mr-auto bd-highlight">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="typeCheckbox1" name="typeCheckbox1" class="custom-control-input" value="true" {{if eq .Type "project" }}checked{{end}} onclick="self.location='vendors?type=project&isfinished={{.IsFinished}}'">
+                        <label class="custom-control-label text-white" for="typeCheckbox1">프로젝트별</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="typeCheckbox2" name="typeCheckbox1" class="custom-control-input" value="false" {{if eq .Type "vendor" }}checked{{end}} onclick="self.location='vendors?type=vendor&isfinished={{.IsFinished}}'">
+                        <label class="custom-control-label text-white" for="typeCheckbox2">외주업체별</label>
+                    </div>
+                </div>
+                <div class="bd-highlight">
+                    <label class="text-white pr-1" for="isfinished">정산완료</label>
+                    <input type="checkbox" data-toggle="toggle" id="isfinished" name="isfinished" data-offstyle="secondary" data-size="small" data-style="ios"
+                    onchange="self.location='vendors?type={{.Type}}&isfinished=' + $(this).prop('checked')"
+                    {{if .IsFinished }} checked {{end}}>
+                </div>
+            </div>
+            <div class="row justify-content-center align-items-center m-3">
+                <div class="col-lg-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <select name="status" id="status" class="custom-select left-radius">
+                                <option value="" {{if eq .Status "" }}selected{{end}}>All</option>
+                                <option value="downpayment" {{if eq .Status "downpayment" }}selected{{end}}>계약금</option>
+                                <option value="mediumplating" {{if eq .Status "mediumplating" }}selected{{end}}>중도금</option>
+                                <option value="balance" {{if eq .Status "balance" }}selected{{end}}>잔금</option>
+                            </select>
+                        </div>
+                        <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="{{.SearchWord}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-darkmode" id="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportvendors" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    {{if ge .Token.AccessLevel 3}}
+                        <a href="/addvendor-page" class="btn btn-outline-warning btn-sm">+</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="mx-auto freeze-table">
+                <!-- 프로젝트별 테이블 -->
+                {{if eq .Type "project"}}
+                    <table name="vendortable" id="vendortable" class="table table-sm text-center table-hover text-white">
+                        <thead>
+                            <tr>
+                                <th class="border-top-white border-bottom-white border-right-gray">프로젝트</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">벤더명</th>
+                                <th class="border-top-white border-bottom-white border-right-white">계약일</th>
+                                <th class="border-top-white border-bottom-white border-right-gray total">Total</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">계약금</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">중도금</th>
+                                <th class="border-top-white border-bottom-white border-right-white">잔금</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">컷수</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">태스크</th>
+                                <th class="border-top-white border-bottom-white border-right-white">컷별단가</th>
+                                <th class="border-top-white border-bottom-white {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}">정산체크</th>
+                                {{if ge $.Token.AccessLevel 3}}
+                                    <th class="border-top-white border-bottom-white"></th>
+                                {{end}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range $projectID, $vendor := .Vendors}}
+                                {{$plen := lenOfVendorsMapFunc $vendor true}}
+                                {{$pnum := 0}}
+
+                                {{range $name, $vendorList := $vendor}}
+                                    {{$vlen := lenOfVendorsListFunc $vendorList}}
+                                    {{$vnum := 0}}
+                                    
+                                    {{range $data := $vendorList}}
+                                        {{$mplen := len $data.MediumPlating}}
+                                        
+                                        {{if eq $mplen 0}} <!-- 중도금이 존재하지 않는 경우 -->
+                                            <tr>
+                                                {{if eq $pnum 0}}
+                                                    <td class="border-top-gray border-right-gray" rowspan="{{$plen}}">{{$data.ProjectName}}</td>
+                                                {{end}}
+                                                {{if eq $vnum 0}}
+                                                    <td class="border-top-gray border-right-gray" rowspan="{{$vlen}}">{{$data.Name}}</td>
+                                                {{end}}
+                                                <td class="border-top-gray border-right-white">{{stringToDateFunc $data.Date}}</td>
+                                                <td class="border-top-gray border-right-gray total text-right">{{decryptCostFunc $data.Expenses true}}</td>
+                                                {{if ne $data.Downpayment.Expenses ""}}
+                                                    <td class="border-top-gray border-right-gray text-right">
+                                                        {{$tmp := decryptCostFunc $data.Downpayment.Expenses true}}
+                                                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                        {{$tmp}}
+                                                        <span class="dropright">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                <div class="dropdown-header text-center text-white">
+                                                                    <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Downpayment.Date}}</h6>
+                                                                    <h6 {{if and (eq $data.Downpayment.Status true) (ne $data.Downpayment.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Downpayment.PayedDate}}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </td>
+                                                {{else}}
+                                                    <td class="border-top-gray border-right-gray"></td> <!-- 계약금이 없는 경우 -->
+                                                {{end}}
+                                                <td class="border-top-gray border-right-gray"></td> <!-- 중도금 빈칸 -->
+                                                {{if ne $data.Balance.Expenses ""}}
+                                                    <td class="border-top-gray border-right-white text-right">
+                                                        {{$tmp := decryptCostFunc $data.Balance.Expenses true}}
+                                                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                        {{$tmp}}
+                                                        <span class="dropright">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                <div class="dropdown-header text-center text-white">
+                                                                    <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Balance.Date}}</h6>
+                                                                    <h6 {{if and (eq $data.Balance.Status true) (ne $data.Balance.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Balance.PayedDate}}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </td>
+                                                {{else}}
+                                                    <td class="border-top-gray border-right-white"></td> <!-- 잔금이 없는 경우 -->
+                                                {{end}}
+                                                <td class="border-top-gray border-right-gray">{{$data.Cuts}}</td>
+                                                <td class="border-top-gray border-right-gray">{{listToStringFunc $data.Tasks true}}</td>
+                                                <td class="border-top-gray border-right-white text-right">{{calUnitPriceByCutsFunc $data.Expenses $data.Cuts}}</td>
+                                                <td class="border-top-gray {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}">
+                                                    {{if ne $data.Downpayment.Expenses ""}}
+                                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                                            <input type="checkbox" class="custom-control-input" name="downpaymentstatus" id="downpaymentstatus" {{if eq $data.Downpayment.Status true}}checked{{end}} disabled>
+                                                            <label class="text-white custom-control-label" for="downpaymentstatus">계약금</label>
+                                                        </div>
+                                                    {{end}}
+                                                    {{if ne $data.Balance.Expenses ""}}
+                                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                                            <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" {{if eq $data.Balance.Status true}}checked{{end}} disabled>
+                                                            <label class="text-white custom-control-label" for="balancestatus">잔금</label>
+                                                        </div>
+                                                    {{end}}
+                                                </td>
+                                                {{if ge $.Token.AccessLevel 3}}
+                                                    <td class="border-top-gray">
+                                                        <a class="finger badge badge-warning" href="/edit-vendor?id={{$data.ID.Hex}}&isfinished={{$.IsFinished}}">Edit</a>
+                                                        {{if eq $.Token.AccessLevel 4}}
+                                                            <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmvendor" onclick="setRmVendorModalFunc('{{$data.ID.Hex}}', '{{$data.Project}}', '{{$data.Name}}')">Del</span>
+                                                        {{end}}
+                                                    </td>
+                                                {{end}}
+                                            </tr>
+                                        {{else}} <!-- 중도금이 존재하는 경우 -->
+                                            {{range $n, $mp := $data.MediumPlating}}
+                                                <tr>
+                                                    {{if and (eq $pnum 0) (eq $n 0)}}
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$plen}}">{{$data.ProjectName}}</td>
+                                                    {{end}}
+                                                    {{if and (eq $vnum 0) (eq $n 0)}}
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$vlen}}">{{$data.Name}}</td>
+                                                    {{end}}
+                                                    {{if eq $n 0}}
+                                                        <td class="border-top-gray border-right-white" rowspan="{{$mplen}}">{{stringToDateFunc $data.Date}}</td>
+                                                        <td rowspan="{{$mplen}}" class="border-top-gray border-right-gray text-right total">{{decryptCostFunc $data.Expenses true}}</td>
+                                                        {{if ne $data.Downpayment.Expenses ""}}
+                                                            <td rowspan="{{$mplen}}" class="border-top-gray border-right-gray text-right">
+                                                                {{$tmp := decryptCostFunc $data.Downpayment.Expenses true}}
+                                                                {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                                {{$tmp}}
+                                                                <span class="dropright">
+                                                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <div class="dropdown-header text-center text-white">
+                                                                            <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Downpayment.Date}}</h6>
+                                                                            <h6 {{if and (eq $data.Downpayment.Status true) (ne $data.Downpayment.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Downpayment.PayedDate}}</h6>
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </td>
+                                                        {{else}}
+                                                            <td class="border-top-gray border-right-gray" rowspan="{{$mplen}}"></td> <!-- 계약금이 없는 경우 -->
+                                                        {{end}}
+                                                    {{end}}
+                                                    <td class="border-top-gray border-right-gray text-right">
+                                                        {{$tmp := decryptCostFunc $mp.Expenses true}}
+                                                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                        {{$tmp}}
+                                                        <span class="dropright">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                <div class="dropdown-header text-center text-white">
+                                                                    <h6>세금 계산서 발행일 : {{stringToDateFunc $mp.Date}}</h6>
+                                                                    <h6 {{if and (eq $mp.Status true) (ne $mp.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $mp.PayedDate}}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </td>
+                                                    {{if eq $n 0}}
+                                                        {{if ne $data.Balance.Expenses ""}}
+                                                            <td rowspan="{{$mplen}}" class="border-top-gray border-right-white text-right">
+                                                                {{$tmp := decryptCostFunc $data.Balance.Expenses true}}
+                                                                {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                                {{$tmp}}
+                                                                <span class="dropright">
+                                                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <div class="dropdown-header text-center text-white">
+                                                                            <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Balance.Date}}</h6>
+                                                                            <h6 {{if and (eq $data.Balance.Status true) (ne $data.Balance.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Balance.PayedDate}}</h6>
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </td>
+                                                        {{else}}
+                                                            <td rowspan="{{$mplen}}" class="border-top-gray border-right-white"></td> <!-- 잔금이 없는 경우 -->
+                                                        {{end}}
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$mplen}}">{{$data.Cuts}}</td>
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$mplen}}">{{listToStringFunc $data.Tasks true}}</td>
+                                                        <td rowspan="{{$mplen}}" class="border-top-gray border-right-white text-right">{{calUnitPriceByCutsFunc $data.Expenses $data.Cuts}}</td>
+                                                        <td class="border-top-gray {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}" rowspan="{{$mplen}}">
+                                                            {{if ne $data.Downpayment.Expenses ""}}
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    <input type="checkbox" class="custom-control-input" name="downpaymentstatus" id="downpaymentstatus" {{if eq $data.Downpayment.Status true}}checked{{end}} disabled>
+                                                                    <label class="text-white custom-control-label" for="downpaymentstatus">계약금</label>
+                                                                </div>
+                                                            {{end}}
+                                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                                <input type="checkbox" class="custom-control-input" name="mediumplatingstatus" id="mediumplatingstatus" {{if eq (checkMediumPlatingStatusFunc $data.MediumPlating) true}}checked{{end}} disabled>
+                                                                <label class="text-white custom-control-label" for="mediumplatingstatus">중도금</label>
+                                                            </div>
+                                                            {{if ne $data.Balance.Expenses ""}}
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" {{if eq $data.Balance.Status true}}checked{{end}} disabled>
+                                                                    <label class="text-white custom-control-label" for="balancestatus">잔금</label>
+                                                                </div>
+                                                            {{end}}
+                                                        </td>
+                                                        {{if ge $.Token.AccessLevel 3}}
+                                                            <td class="border-top-gray" rowspan="{{$mplen}}">
+                                                                <a class="finger badge badge-warning" href="/edit-vendor?id={{$data.ID.Hex}}&isfinished={{$.IsFinished}}">Edit</a>
+                                                                {{if eq $.Token.AccessLevel 4}}
+                                                                    <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmvendor" onclick="setRmVendorModalFunc('{{$data.ID.Hex}}', '{{$data.Project}}', '{{$data.Name}}')">Del</span>
+                                                                {{end}}
+                                                            </td>
+                                                        {{end}}
+                                                    {{end}}
+                                                </tr>
+                                            {{end}}
+                                        {{end}}
+                                        {{$pnum = addIntFunc $pnum 1}}
+                                        {{$vnum = addIntFunc $vnum 1}}
+                                    {{end}}
+                                {{end}}
+                            {{end}}
+                        </tbody>
+                    </table>
+                {{end}}
+                <!-- 외주업체별 테이블 -->
+                {{if eq .Type "vendor"}}
+                    <table name="vendortable" id="vendortable" class="table table-sm text-center table-hover text-white">
+                        <thead>
+                            <tr>
+                                <th class="border-top-white border-bottom-white border-right-gray">벤더명</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">프로젝트</th>
+                                <th class="border-top-white border-bottom-white border-right-white">계약일</th>
+                                <th class="border-top-white border-bottom-white border-right-gray total">Total</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">계약금</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">중도금</th>
+                                <th class="border-top-white border-bottom-white border-right-white">잔금</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">컷수</th>
+                                <th class="border-top-white border-bottom-white border-right-gray">태스크</th>
+                                <th class="border-top-white border-bottom-white border-right-white">컷별단가</th>
+                                <th class="border-top-white border-bottom-white {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}">정산체크</th>
+                                {{if ge $.Token.AccessLevel 3}}
+                                    <th class="border-top-white border-bottom-white"></th>
+                                {{end}}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{range $name, $vendor := .Vendors}}
+                                {{$vlen := lenOfVendorsMapFunc $vendor true}}
+                                {{$vnum := 0}}
+
+                                {{range $projectID, $vendorList := $vendor}}
+                                    {{$plen := lenOfVendorsListFunc $vendorList}}
+                                    {{$pnum := 0}}
+
+                                    {{range $data := $vendorList}}
+                                        {{$mplen := len $data.MediumPlating}}
+
+                                        {{if eq $mplen 0}} <!-- 중도금이 존재하지 않는 경우 -->
+                                            <tr>
+                                                {{if eq $vnum 0}}
+                                                    <td class="border-top-gray border-right-gray" rowspan="{{$vlen}}">{{$data.Name}}</td>
+                                                {{end}}
+                                                {{if eq $pnum 0}}
+                                                    <td class="border-top-gray border-right-gray" rowspan="{{$plen}}">{{$data.ProjectName}}</td>
+                                                {{end}}
+                                                <td class="border-top-gray border-right-white">{{stringToDateFunc $data.Date}}</td>
+                                                <td class="border-top-gray border-right-gray total text-right">{{decryptCostFunc $data.Expenses true}}</td>
+                                                {{if ne $data.Downpayment.Expenses ""}}
+                                                    <td class="border-top-gray border-right-gray text-right">
+                                                        {{$tmp := decryptCostFunc $data.Downpayment.Expenses true}}
+                                                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                        {{$tmp}}
+                                                        <span class="dropright">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                <div class="dropdown-header text-center text-white">
+                                                                    <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Downpayment.Date}}</h6>
+                                                                    <h6 {{if and (eq $data.Downpayment.Status true) (ne $data.Downpayment.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Downpayment.PayedDate}}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </td>
+                                                {{else}}
+                                                    <td class="border-top-gray border-right-gray"></td> <!-- 계약금이 없는 경우 -->
+                                                {{end}}
+                                                <td class="border-top-gray border-right-gray"></td> <!-- 중도금 빈칸 -->
+                                                {{if ne $data.Balance.Expenses ""}}
+                                                    <td class="border-top-gray border-right-white text-right">
+                                                        {{$tmp := decryptCostFunc $data.Balance.Expenses true}}
+                                                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                        {{$tmp}}
+                                                        <span class="dropright">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                <div class="dropdown-header text-center text-white">
+                                                                    <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Balance.Date}}</h6>
+                                                                    <h6 {{if and (eq $data.Balance.Status true) (ne $data.Balance.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Balance.PayedDate}}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </td>
+                                                {{else}}
+                                                    <td class="border-top-gray border-right-white"></td> <!-- 잔금이 없는 경우 -->
+                                                {{end}}
+                                                <td class="border-top-gray border-right-gray">{{$data.Cuts}}</td>
+                                                <td class="border-top-gray border-right-gray">{{listToStringFunc $data.Tasks true}}</td>
+                                                <td class="border-top-gray border-right-white text-right">{{calUnitPriceByCutsFunc $data.Expenses $data.Cuts}}</td>
+                                                <td class="border-top-gray {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}">
+                                                    {{if ne $data.Downpayment.Expenses ""}}
+                                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                                            <input type="checkbox" class="custom-control-input" name="downpaymentstatus" id="downpaymentstatus" {{if eq $data.Downpayment.Status true}}checked{{end}} disabled>
+                                                            <label class="text-white custom-control-label" for="downpaymentstatus">계약금</label>
+                                                        </div>
+                                                    {{end}}
+                                                    {{if ne $data.Balance.Expenses ""}}
+                                                        <div class="custom-control custom-checkbox custom-control-inline">
+                                                            <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" {{if eq $data.Balance.Status true}}checked{{end}} disabled>
+                                                            <label class="text-white custom-control-label" for="balancestatus">잔금</label>
+                                                        </div>
+                                                    {{end}}
+                                                </td>
+                                                {{if ge $.Token.AccessLevel 3}}
+                                                    <td class="border-top-gray">
+                                                        <a class="finger badge badge-warning" href="/edit-vendor?id={{$data.ID.Hex}}&isfinished={{$.IsFinished}}">Edit</a>
+                                                        {{if eq $.Token.AccessLevel 4}}
+                                                            <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmvendor" onclick="setRmVendorModalFunc('{{$data.ID.Hex}}', '{{$data.Project}}', '{{$data.Name}}')">Del</span>
+                                                        {{end}}
+                                                    </td>
+                                                {{end}}
+                                            </tr>
+                                        {{else}} <!-- 중도금이 존재하는 경우 -->
+                                            {{range $n, $mp := $data.MediumPlating}}
+                                                <tr>
+                                                    {{if and (eq $vnum 0) (eq $n 0)}}
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$vlen}}">{{$data.Name}}</td>
+                                                    {{end}}
+                                                    {{if and (eq $pnum 0) (eq $n 0)}}
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$plen}}">{{$data.ProjectName}}</td>
+                                                    {{end}}
+                                                    {{if eq $n 0}}
+                                                        <td class="border-top-gray border-right-white" rowspan="{{$mplen}}">{{stringToDateFunc $data.Date}}</td>
+                                                        <td class="border-top-gray border-right-gray total text-right" rowspan="{{$mplen}}">{{decryptCostFunc $data.Expenses true}}</td>
+                                                        {{if ne $data.Downpayment.Expenses ""}}
+                                                            <td class="border-top-gray border-right-gray text-right" rowspan="{{$mplen}}">
+                                                                {{$tmp := decryptCostFunc $data.Downpayment.Expenses true}}
+                                                                {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                                {{$tmp}}
+                                                                <span class="dropright">
+                                                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <div class="dropdown-header text-center text-white">
+                                                                            <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Downpayment.Date}}</h6>
+                                                                            <h6 {{if and (eq $data.Downpayment.Status true) (ne $data.Downpayment.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Downpayment.PayedDate}}</h6>
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </td>
+                                                        {{else}}
+                                                            <td class="border-top-gray border-right-gray" rowspan="{{$mplen}}"></td> <!-- 계약금이 없는 경우 -->
+                                                        {{end}}
+                                                    {{end}}
+                                                    <td class="border-top-gray border-right-gray text-right">
+                                                        {{$tmp := decryptCostFunc $mp.Expenses true}}
+                                                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                        {{$tmp}}
+                                                        <span class="dropright">
+                                                            <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                <div class="dropdown-header text-center text-white">
+                                                                    <h6>세금 계산서 발행일 : {{stringToDateFunc $mp.Date}}</h6>
+                                                                    <h6 {{if and (eq $mp.Status true) (ne $mp.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $mp.PayedDate}}</h6>
+                                                                </div>
+                                                            </div>
+                                                        </span>
+                                                    </td>
+                                                    {{if eq $n 0}}
+                                                        {{if ne $data.Balance.Expenses ""}}
+                                                            <td rowspan="{{$mplen}}" class="text-right border-top-gray border-right-white">
+                                                                {{$tmp := decryptCostFunc $data.Balance.Expenses true}}
+                                                                {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                                                {{$tmp}}
+                                                                <span class="dropright">
+                                                                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                                        <div class="dropdown-header text-center text-white">
+                                                                            <h6>세금 계산서 발행일 : {{stringToDateFunc $data.Balance.Date}}</h6>
+                                                                            <h6 {{if and (eq $data.Balance.Status true) (ne $data.Balance.PayedDate "" )}} style="font-weight: bold; color: #ecc585;" {{end}}>지급일 : {{stringToDateFunc $data.Balance.PayedDate}}</h6>
+                                                                        </div>
+                                                                    </div>
+                                                                </span>
+                                                            </td>
+                                                        {{else}}
+                                                            <td rowspan="{{$mplen}}" class="border-top-gray border-right-white"></td> <!-- 잔금이 없는 경우 -->
+                                                        {{end}}
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$mplen}}">{{$data.Cuts}}</td>
+                                                        <td class="border-top-gray border-right-gray" rowspan="{{$mplen}}">{{listToStringFunc $data.Tasks true}}</td>
+                                                        <td rowspan="{{$mplen}}" class="text-right border-top-gray border-right-white">{{calUnitPriceByCutsFunc $data.Expenses $data.Cuts}}</td>
+                                                        <td class="border-top-gray {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}" rowspan="{{$mplen}}">
+                                                            {{if ne $data.Downpayment.Expenses ""}}
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    <input type="checkbox" class="custom-control-input" name="downpaymentstatus" id="downpaymentstatus" {{if eq $data.Downpayment.Status true}}checked{{end}} disabled>
+                                                                    <label class="text-white custom-control-label" for="downpaymentstatus">계약금</label>
+                                                                </div>
+                                                            {{end}}
+                                                            <div class="custom-control custom-checkbox custom-control-inline">
+                                                                <input type="checkbox" class="custom-control-input" name="mediumplatingstatus" id="mediumplatingstatus" {{if eq (checkMediumPlatingStatusFunc $data.MediumPlating) true}}checked{{end}} disabled>
+                                                                <label class="text-white custom-control-label" for="mediumplatingstatus">중도금</label>
+                                                            </div>
+                                                            {{if ne $data.Balance.Expenses ""}}
+                                                                <div class="custom-control custom-checkbox custom-control-inline">
+                                                                    <input type="checkbox" class="custom-control-input" name="balancestatus" id="balancestatus" {{if eq $data.Balance.Status true}}checked{{end}} disabled>
+                                                                    <label class="text-white custom-control-label" for="balancestatus">잔금</label>
+                                                                </div>
+                                                            {{end}}
+                                                        </td>
+                                                        {{if ge $.Token.AccessLevel 3}}
+                                                            <td class="border-top-gray" rowspan="{{$mplen}}">
+                                                                <a class="finger badge badge-warning" href="/edit-vendor?id={{$data.ID.Hex}}&isfinished={{$.IsFinished}}">Edit</a>
+                                                                {{if eq $.Token.AccessLevel 4}}
+                                                                    <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmvendor" onclick="setRmVendorModalFunc('{{$data.ID.Hex}}', '{{$data.Project}}', '{{$data.Name}}')">Del</span>
+                                                                {{end}}
+                                                            </td>
+                                                        {{end}}
+                                                    {{end}}
+                                                </tr>
+                                            {{end}}
+                                        {{end}}
+                                        {{$pnum = addIntFunc $pnum 1}}
+                                        {{$vnum = addIntFunc $vnum 1}}
+                                    {{end}}
+                                {{end}}
+                            {{end}}
+                        </tbody>
+                    </table>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    {{template "footer"}}
+</body>
+
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap-toggle.min.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

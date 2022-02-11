@@ -1,0 +1,56 @@
+{{define "uploadshot-fail"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container py-4 px-2">
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pb-2">
+            <div class="pt-3 pb-3">
+                <h2 class="text-muted text-center">Upload Shot Status</h2>
+            </div>
+            <div class="pt-3 pb-3">
+                <h6 class="text-muted text-center">이와 같은 이유로 인해 아래의 샷 정보를 추가 및 업데이트하지 못하였습니다.</h6>
+            </div>
+        </div>
+        <div class="freeze-table mx-auto" style="max-width: 90%;">
+            <table class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray">ShotCode</th>
+                        <th class="border-top-white border-bottom-white">Error Log</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $shot, $err := .ShotInfo}}
+                        <tr>
+                            <td class="border-top-gray border-right-gray">{{$shot}}</td>
+                            <td class="border-top-gray">{{$err}}</td>
+                        </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        <div class="text-center mb-5">
+            <a href="/shotasset" class="btn btn-darkmode mt-5">Confirm</a>
+            <a href="/" class="btn btn-darkmode mt-5">Home</a>
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+{{end}}

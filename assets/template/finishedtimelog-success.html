@@ -1,0 +1,31 @@
+{{define "finishedtimelog-success"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container p-5">
+        <div class="col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="pt-3 pb-5">
+                <h2 class="text-center section-heading text-muted">Timelog Of Finished Project Status</h2>
+            </div>
+            <div>
+                <h4 class="text-center text-muted">Success!</h4>
+                <br>
+                <h6 class="text-center text-muted">
+                    정산 완료된 프로젝트의 처리 상태가 설정된 경우 <br>프로젝트 관리에서
+                    한번 업데이트 하셔야 <br>정산 완료된 프로젝트의 최종 비용에 반영됩니다.
+                </h6>
+            </div>
+            <div class="text-center">
+                <a href="/timelog-vfx" class="btn btn-darkmode mt-5">VFX Timelog</a>
+                <a href="/projects" class="btn btn-darkmode mt-5">Projects</a>
+                <a href="/" class="btn btn-darkmode mt-5">Home</a>
+            </div>
+        </div>
+    </div>
+{{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+</html>
+{{end}}

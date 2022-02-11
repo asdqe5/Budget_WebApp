@@ -1,0 +1,11 @@
+{{define "mail-project"}}
+<html>
+    <body>
+        <h3><b>프로젝트 세금계산서 발행일 알람 메일입니다</b></h3><br><br>
+        <h4>오늘은 아래의 프로젝트들의 세금계산서 발행일입니다.</h4><br>
+        {{range $p := .Projects}}
+            <h4>- {{$p.Name}} ({{listToStringFunc $p.Type true}})</h4>
+        {{end}}
+    </body>
+</html>
+{{end}}

@@ -1,0 +1,119 @@
+{{define "smdetail-laborcost"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-timelog" .}}
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <div class="row justify-content-start align-items-center mx-auto pt-3 pb-5">
+            <div class="col">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="typeCheckbox1" name="typeCheckbox1" class="custom-control-input" {{ if eq .Type "vfx" }}checked{{end}}
+                    onclick="self.location='smdetail-laborcost?date={{.Date}}&type=vfx'">
+                    <label class="custom-control-label text-muted" for="typeCheckbox1">VFX</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" id="typeCheckbox2" name="typeCheckbox1" class="custom-control-input" {{ if eq .Type "cm" }}checked{{end}}
+                    onclick="self.location='smdetail-laborcost?date={{.Date}}&type=cm'">
+                    <label class="custom-control-label text-muted" for="typeCheckbox2">CM</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/export-smdetaillaborcost" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="col-sm-2 bd-highlight" style="padding-right:0">
+                    <input class="form-control" type="month" format="yyyy-MM" value="{{.Date}}" onchange="self.location='smdetail-laborcost?date=' + this.value + '&type={{.Type}}'">
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto freeze-table">
+            <table name="smdetaillaborcosttable" id="smdetaillaborcosttable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray border-top-white" rowspan="2">ID</th>
+                        <th class="border-bottom-white border-right-white border-top-white" rowspan="2">이름</th>
+                        {{$plen := len .Projects}}
+                        <th class="border-bottom-gray border-right-white border-top-white" colspan="{{$plen}}">프로젝트</th>
+                        <th class="border-bottom-white border-top-white total" rowspan="2">Total</th>
+                    </tr>
+                    <tr>
+                        {{range $p := .Projects}}
+                            <th class="border-bottom-white border-right-gray">{{$p}}</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $artist := .Artist}}
+                        <tr>
+                            <td class="border-top-gray border-right-gray">{{$artist.ID}}</td>
+                            <td class="border-top-gray border-right-white">{{$artist.Name}}</td>
+                            {{$laborcost := index $.DetailLaborCost $artist.ID}}
+                            {{range $n, $p := $.Projects}}
+                                <td {{if eq $n (addIntFunc $plen -1)}} class="border-top-gray border-right-white text-right" {{else}} class="border-top-gray border-right-gray text-right" {{end}}>{{decryptCostFunc (index $laborcost $p) true}}</td>
+                            {{end}}
+                            <td class="border-top-gray total text-right">{{decryptCostFunc (index $.TotalArtistLaborCost $artist.ID) true}}</td>
+                        </tr>
+                    {{end}}
+                    <tr>
+                        <td colspan="2" class="border-top-white border-right-white total">Total</td>
+                        {{range $n, $p := .Projects}}
+                            <td {{if eq $n (addIntFunc $plen -1)}} class="border-top-white border-right-white total text-right" {{else}} class="border-top-white border-right-gray total text-right" {{end}}>{{decryptCostFunc (index $.TotalProjectLaborCost $p) true}}</td>
+                        {{end}}
+                        <td class="border-top-white total text-right">{{decryptCostFunc .TotalLaborCost true}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<!-- DB에 저장되지 않은 아티스트들 -->
+{{if .NoneArtists}}
+    {{if eq .Token.AccessLevel 4}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+            document.getElementById("modal-noneartists-btn").setAttribute("onclick", "self.location='artists-vfx'")
+            $(window).on('load', function () {
+                $("#modal-noneartists").modal("show");
+            });
+        </script>
+    {{else}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+            $(window).on('load', function () {
+                $("#modal-noneartists").modal("show");
+            });
+        </script>
+    {{end}}
+{{end}}
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

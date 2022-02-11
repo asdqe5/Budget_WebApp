@@ -1,0 +1,120 @@
+{{define "help-artists"}}
+    <!-- Artist Help -->
+    <div class="p-5">
+        <h3 class="pt-2 pb-4 text-darkmode text-center">Artists</h3>
+
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pb-2" style="width: 1000px;">
+            <div class="pt-2 pb-2" style="width: 120px;">
+                <input class="form-control" type="number" format="yyyy" placeholder="yyyy">
+            </div>
+
+            <div class="d-flex bd-highlight pb-2">
+                <div class="bd-highlight">
+                    <div class="dropdown mr-2">
+                        <a class="btn btn-outline-info dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuButton" data-toggle="dropdown" data-target="dropdown-menu" aria-haspopup="true" aria-expanded="false">
+                            Sort
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <button class="dropdown-item">ID</button>
+                            <button class="dropdown-item">Dept</button>
+                            <button class="dropdown-item">Team</button>
+                            <button class="dropdown-item">Name</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mr-auto bd-highlight">
+                    <button class="btn btn-outline-warning btn-sm">Download</button>
+                </div>
+                <div class="bd-highlight mr-2">
+                    <button class="btn btn-outline-danger btn-sm">Update</button>
+                </div>
+                <div class="bd-highlight">
+                    <button class="btn btn-outline-warning btn-sm">+</button>
+                </div>
+            </div>
+
+            <table class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray">Shotgun ID</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">부서</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">팀</th>
+                        <th class="border-top-white border-bottom-white border-right-white">이름</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">입사일</th>
+                        <th class="border-top-white border-bottom-white border-right-white">퇴사일</th>
+                        <th class="border-top-white border-bottom-white border-right-gray">근무일수</th>
+                        <th class="border-top-white border-bottom-white border-right-white">시급</th>
+                        <th class="border-top-white border-bottom-white"></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class="border-right-gray">90</td>
+                        <td class="border-right-gray">System</td>
+                        <td class="border-right-gray">TD</td>
+                        <td class="border-right-white">심애림</td>
+                        <td class="border-right-gray">2020년 03월 17일</td>
+                        <td class="border-right-white"></td>
+                        <td class="border-right-gray">120일</td>
+                        <td class="border-right-white">9,028 원</td>
+                        <td>
+                            <span class="finger badge badge-warning">Edit</span>
+                            <span class="finger badge badge-danger">Del</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="text-darkmode text-center">
+            <p class="h6 text-darkmode pt-4 mx-auto">
+                아티스트를 관리할 수 있는 페이지입니다.
+                <div class="d-flex justify-content-center">
+                    <div class="pt-2 pb-2" style="width: 120px;">
+                        <input class="form-control" type="number" format="yyyy" placeholder="yyyy">
+                    </div>
+                    <div class="p-2">
+                        <p class="h6 text-darkmode pt-2 mx-auto">: 원하는 연도의 아티스트 데이터를 확인할 수 있습니다.</p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="dropdown pt-2">
+                        <a class="btn btn-outline-info dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuButton" data-toggle="dropdown" data-target="dropdown-menu" aria-haspopup="true" aria-expanded="false">
+                            Sort
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <button class="dropdown-item">ID</button>
+                            <button class="dropdown-item">Dept</button>
+                            <button class="dropdown-item">Team</button>
+                            <button class="dropdown-item">Name</button>
+                        </div>
+                    </div>
+                    <div class="p-2">
+                        <p class="h6 text-darkmode pt-2 mx-auto">: ID, 부서, 팀, 이름순으로 정렬하여 확인할 수 있습니다.</p>
+                    </div>
+                </div>
+                <p class="h6 text-darkmode pt-2 mx-auto">
+                    <span class="btn btn-outline-warning btn-sm mr-1">Download</span>
+                    : 아티스트 데이터를 엑셀 파일로 다운로드합니다.
+                </p>
+                <p class="h6 text-darkmode pt-2 mx-auto">
+                    <span class="btn btn-outline-danger btn-sm mr-1">Update</span>
+                    : 엑셀 파일로 아티스트 데이터를 한번에 추가 및 업데이트합니다.
+                </p>
+                <p class="h6 text-darkmode pt-2 mx-auto">
+                    <span class="btn btn-outline-warning btn-sm mr-1">+</span>
+                    : 한 명의 아티스트를 추가합니다.
+                </p>
+                <p class="h6 text-darkmode pt-2 mx-auto">
+                    <span class="finger badge badge-warning mr-1">Edit</span>
+                    : 해당 아티스트의 데이터를 수정합니다.
+                </p>
+                <p class="h6 text-darkmode pt-2 mx-auto">
+                    <span class="finger badge badge-danger mr-1">Del</span>
+                    : 해당 아티스트를 삭제합니다.
+                </p>
+            </p>
+        </div>
+    </div>
+{{end}}

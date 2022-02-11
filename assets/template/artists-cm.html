@@ -1,0 +1,119 @@
+{{define "artists-cm"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-artist" .}}
+
+    <div class="container py-4 px-2" style="max-width: 80%;">
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pt-4 pb-2">
+            <div class="d-flex">
+                <div class="mr-auto bd-highlight">
+                    <input class="form-control" type="number" format="yyyy" value={{.Year}} onchange="self.location='artists-cm?year=' + this.value">
+                </div>
+                <div class="bd-highlight">
+                    <label class="text-white pr-1" for="resination">퇴사자</label>
+                    <input type="checkbox" data-toggle="toggle" id="resination" data-offstyle="secondary" data-size="small" data-style="ios"
+                    onchange="self.location='artists-cm?year={{.Year}}&resination=' + $(this).prop('checked')"
+                    {{if .Resination }} checked {{end}}
+                    >
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="bd-highlight">
+                    <div class="dropdown mr-2">
+                        <a class="btn btn-outline-info dropdown-toggle btn-sm" href="#" role="button" id="dropdownMenuButton" data-toggle="dropdown" data-target="dropdown-menu" aria-haspopup="true" aria-expanded="false">
+                            Sort
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <button class="dropdown-item" onclick="self.location='artists-cm?year={{.Year}}&resination={{.Resination}}&sort=id'">ID</button>
+                            <button class="dropdown-item" onclick="self.location='artists-cm?year={{.Year}}&resination={{.Resination}}&sort=team'">Team</button>
+                            <button class="dropdown-item" onclick="self.location='artists-cm?year={{.Year}}&resination={{.Resination}}&sort=name'">Name</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportartists-cm" method="POST">
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                    </form>
+                </div>
+                <div class="bd-highlight mr-2">
+                    <form action="/updateartists-cm" method="POST">
+                        <button type="submit" class="btn btn-outline-danger btn-sm">Update</button>
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    <button type="button" class="btn btn-outline-warning btn-sm" data-toggle="modal" data-target="#modal-addartistcm">+</button>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <input type="hidden" id="year" name="year" value="{{.Year}}">
+            <div class="col-lg-12 col-md-8 col-sm-12 mx-auto freeze-table">
+                <table class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-top-white border-bottom-white border-right-gray">ID</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">부서</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">팀</th>
+                            <th class="border-top-white border-bottom-white border-right-white">이름</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">입사일</th>
+                            <th class="border-top-white border-bottom-white border-right-white">퇴사일</th>
+                            <th class="border-top-white border-bottom-white border-right-gray">근무일수</th>
+                            <th class="border-top-white border-bottom-white border-right-white">시급</th>
+                            <th class="border-top-white border-bottom-white"></th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {{$artistNum := 0}}
+                        {{range $artist := .Artists}}
+                            <tr>
+                                <td class="border-top-gray border-right-gray">{{$artist.ID}}</td>
+                                <td class="border-top-gray border-right-gray">{{$artist.Dept}}</td>
+                                <td class="border-top-gray border-right-gray">{{$artist.Team}}</td>
+                                <td class="border-top-gray border-right-white">{{$artist.Name}}</td>
+                                <td class="border-top-gray border-right-gray">{{stringToDateFunc $artist.StartDay}}</td> <!-- 아티스트 입사일 -->
+                                <td class="border-top-gray border-right-white">{{stringToDateFunc $artist.EndDay}}</td> <!-- 아티스트 퇴사일 -->
+                                <td class="border-top-gray border-right-gray">{{workingDayByYearFunc $artist $.Year}} 일</td> <!-- 아티스트 근무일수 -->
+                                <td class="border-top-gray border-right-white">{{hourlyWageByYearFunc $artist $.Year}} 원</td> <!-- 아티스트 시급 -->
+                                <td class="border-top-gray">
+                                    <a class="finger badge badge-warning" href="/edit-artistcm?id={{$artist.ID}}">Edit</a>
+                                    <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmartist" onclick="setRmArtistModalFunc('{{$artist.ID}}', '{{$artist.Team}}', '{{$artist.Name}}')">Del</span>
+                                </td>
+                            </tr>
+                            {{$artistNum = addIntFunc $artistNum 1}}
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap-toggle.min.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

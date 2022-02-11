@@ -1,0 +1,97 @@
+{{define "timelogs-sup"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-timelog" .}}
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <form method="POST" action="/editsuptimelogs-submit?date={{.Date}}">
+            <div class="pt-5 pb-5">
+                <h2 class="text-center section-heading text-muted">Supervisors Timelog</h2>
+            </div>
+            <div class="mx-auto pt-4 pb-2">
+                <div class="col-sm-2" style="padding-left:0">
+                    <input class="form-control" type="month" format="yyyy-MM" value="{{.Date}}" onchange="self.location='timelogs-sup?date=' + this.value">
+                </div>
+            </div>
+            <div class="mx-auto freeze-table">
+                <table name="suptimelogstable" id="suptimelogstable" class="table text-center text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">ID</th>
+                            <th class="border-top-white border-bottom-white border-right-white" rowspan="2">이름</th>
+                            {{$plen := len .Projects}}
+                            <th class="border-top-white border-bottom-gray border-right-white" colspan="{{$plen}}">프로젝트</th>
+                            <th class="border-top-white border-bottom-white total" rowspan="2" style="min-width: 100px;">Total</th>
+                        </tr>
+                        <tr>
+                            {{range $n, $p := .Projects}}
+                            <th {{if eq $n (addIntFunc $plen -1)}} class="border-bottom-white" {{else}} class="border-bottom-white border-right-gray" {{end}}>{{$p.ID}}</th>
+                            {{end}}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $i, $sup := .Supervisors}}
+                            <tr>
+                                <td class="border-top-gray border-right-gray">{{$sup.ID}}</td>
+                                <td class="border-top-gray border-right-white">{{$sup.Name}}</td>
+                                {{$timelogs := index $.SupervisorTimelog $sup.ID}}
+                                {{range $n, $p := $.Projects}}
+                                    <td {{if eq $n (addIntFunc $plen -1)}} class="border-top-gray border-right-white" {{else}} class="border-top-gray border-right-gray" {{end}}>
+                                        <input type="number" name="{{$sup.ID}}-{{$p.ID}}-timelog" class="form-control" {{range $t := $timelogs}} {{if eq $p.ID $t.Project}} value="{{supDurationToTimeFunc $t.Duration}}"{{end}}{{end}} onchange="calTotalSupTimelogFunc('{{$i}}')">
+                                    </td>
+                                {{end}}
+                                {{$totalDuration := index $.TotalSupervisorTimelog $sup.ID}}
+                                <td class="border-top-gray total">{{supDurationToTimeFunc $totalDuration}}h</td>
+                            </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>       
+            <div class="text-center">
+                <button type="submit" class="btn btn-darkmode mt-5 mb-5">Update</button>
+            </div>
+        </form>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<!-- DB에 저장되지 않은 아티스트들 -->
+{{if .NoneArtists}}
+    {{if eq .Token.AccessLevel 4}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+            document.getElementById("modal-noneartists-btn").setAttribute("onclick", "self.location='artists-vfx'")
+            $(window).on('load', function () {
+                $("#modal-noneartists").modal("show");
+            });
+        </script>
+    {{else}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+            $(window).on('load', function () {
+                $("#modal-noneartists").modal("show");
+            });
+        </script>
+    {{end}}
+{{end}}
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

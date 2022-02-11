@@ -1,0 +1,30 @@
+{{define "updatetimelogcm-projectfail"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container py-4 px-2">
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pb-2">
+            <div class="pt-3 pb-3">
+                <h2 class="text-muted text-center">Update Timelog Status</h2>
+            </div>
+            <div class="pt-3 pb-3">
+                <h5 class="text-muted text-center">프로젝트가 존재하지 않아서 해당 월의 타임로그의 결산을 완료할 수 없습니다.</h5>
+                <h5 class="text-muted text-center"><strong>프로젝트를 추가한 후에 다시 타임로그를 업데이트해주셔야 인건비 계산이 이루어집니다.</strong></h5>
+            </div>
+            <div class="pt-3 pb-3">
+                <h4 class="text-white text-center">{{range $p := .Projects}}{{$p}} {{end}}</h4>
+            </div>
+            <div class="text-center">
+                <a href="/projects" class="btn btn-darkmode mt-5">Projects</a>
+                <a href="/timelog-cm" class="btn btn-darkmode mt-5">Timelog</a>
+                <a href="/" class="btn btn-darkmode mt-5">Home</a>
+            </div>
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+</html>
+{{end}}

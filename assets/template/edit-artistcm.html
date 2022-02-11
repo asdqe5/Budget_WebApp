@@ -1,0 +1,114 @@
+{{define "edit-artistcm"}}
+{{template "head"}}
+<body>
+    <form action="/editartistcm-submit" method="post" onsubmit="return editArtistPageBlankCheckFunc()">
+    {{template "navbar" .}}
+        <div class="container p-5">
+            <div class="col-lg-10 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-5">
+                    <h2 class="text-center section-heading text-muted">Edit CM Artist</h2>
+                </div>
+                <div class="row">
+                    <div class="ml-5 pt-3 pb-3">
+                        <h5 class="section-heading text-muted"><기본 및 연봉 정보></h5>
+                    </div>
+                </div>
+                <div class="row pb-3">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">ID</label>
+                            <input type="text" id="id" name="id" class="form-control" value="{{.Artist.ID}}" readonly>
+                            <small class="form-text text-muted">ID</small>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">Dept</label>
+                            <input type="text" id="dept" name="dept" class="form-control" value="{{.Artist.Dept}}" readonly>
+                            <small class="form-text text-muted">부서는 CM입니다.</small>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">Team</label>
+                            <input type="text" id="team" name="team" class="form-control" value="{{.Artist.Team}}">
+                            <small class="form-text text-muted">팀을 입력해주세요</small>
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">Name</label>
+                            <input type="text" id="name" name="name" class="form-control" value="{{.Artist.Name}}">
+                            <small class="form-text text-muted">이름을 입력해주세요</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row pb-3">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">Salary</label>
+                            <input type="text" id="salary" name="salary" class="form-control" value="{{mapToStringFunc .Artist.Salary}}">
+                            <small class="form-text text-muted">연봉을 입력해주세요(2019:2400,2020:2400 형식으로 입력해주세요.)</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="row">
+                    <div class="ml-5 pt-3 pb-1">
+                        <h5 class="section-heading text-muted"><입사 및 퇴사일 정보></h5>
+                    </div>
+                </div>
+                <div class="row pt-3">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">입사일</label>
+                            <input type="date" id="startday" name="startday" class="form-control" value="{{.Artist.StartDay}}" max="9999-12-31">
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">퇴사일</label>
+                            <input type="date" id="endday" name="endday" class="form-control" value="{{.Artist.EndDay}}" max="9999-12-31">
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                {{$date := ""}}
+                {{$salary := ""}}
+                {{range $key, $value := .Artist.ChangedSalary}}
+                    {{$date = $key}}
+                    {{$salary = decryptCostFunc $value false}}
+                {{end}}
+                <div class="row">
+                    <div class="ml-5 pt-3 pb-1">
+                        <h5 class="section-heading text-muted"><동일 연도 연봉 변경 정보></h5>
+                    </div>
+                </div>
+                <div class="row pt-3">
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">연봉 변경일</label>
+                            <input type="date" id="changedate" name="changedate" class="form-control" value="{{$date}}" max="9999-12-31">
+                        </div>
+                    </div>
+                    <div class="col-sm">
+                        <div class="form-group">
+                            <label class="text-muted">변경 전 연봉</label>
+                            <input type="number" id="changesalary" name="changesalary" class="form-control" min="0" value="{{$salary}}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-outline-warning mt-5">Update</button>
+            </div>
+        </div>
+    </form>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

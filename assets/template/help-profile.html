@@ -1,0 +1,60 @@
+{{define "help-profile"}}
+    <!-- Profile Edit Help -->
+    <div class="p-5">
+        <h3 class="pt-2 pb-4 text-darkmode text-center">Profile</h3>
+        <div class="row">
+            <div class="mx-auto" style="width: 500px;">
+                <div class="">
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="text-muted">Team</label>
+                            <input type="text" class="form-control" id="team" name="team" value="Team">
+                            <small class="form-text text-muted">팀</small>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="text-muted">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="Name">
+                            <small class="form-text text-muted">이름</small>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="text-muted">비밀번호</label>
+                            <span class="ml-4 text-warning"><u>Update Password</u></span>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="text-muted">AccessLevel</label>
+                            <input type="text" class="form-control" value="AccessLevel" disabled>
+                            <small class="form-text text-muted">권한</small>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label class="text-muted">Token</label>
+                            <input type="text" class="form-control" value="Token" disabled>
+                            <small class="form-text text-muted">RestAPI에 접근할 수 있는 Token</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center">
+            <span class="btn btn-darkmode mt-5">Update</span>
+        </div>
+        <div class="row pt-4">
+            <div class="mx-auto text-center">
+                <div class="text-left text-darkmode p-4 m-2 help-text">
+                    유저의 프로필을 수정할 수 있는 페이지입니다.<br>
+                    <br>
+                    • 본인의 Team, Name을 수정할 수 있습니다.<br>
+                    • <span class="text-warning"><u>Update Password</u></span> : 본인의 비밀번호를 변경할 수 있습니다.<br>
+                    • 본인의 AccessLevel과 Token 값은 변경할 수 없습니다.<br>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}

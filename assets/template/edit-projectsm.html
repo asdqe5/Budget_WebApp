@@ -1,0 +1,225 @@
+{{define "edit-projectsm"}}
+{{template "head"}}
+<body onload="setIsFinishedInEditFunc('{{.FinishedType}}')">
+    {{template "navbar" .}}
+    {{template "modal-project" .}}
+    <input type="hidden" id="token" value="{{.User.Token}}">
+    <div class="container-md p-5">
+        <form action="/editprojectsm-submit" method="POST" onsubmit="return addProjectPageBlankCheckFunc(false)">
+            <input type="hidden" name="searcheddate" id="searcheddate" value="{{.SearchedDate}}">
+            <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+                <div class="pt-3 pb-5">
+                    <h2 class="section-heading text-muted text-center">Edit Project - 결산</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-group pb-2">
+                        <label class="text-muted">Project ID</label>
+                        <input type="text" class="form-control" id="id" name="id"  value="{{.Project.ID}}" readonly>
+                        <small class="form-text text-muted">프로젝트 영문명 / 영문 및 숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">프로젝트 한글명</label>
+                        <input type="text" class="form-control" id="name" name="name" value="{{.Project.Name}}">
+                        <input type="hidden" id="originalname" name="originalname" value="{{.Project.Name}}">
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 시작일</label>
+                                <input type="month" class="form-control" id="startdate" name="startdate" value="{{.Project.StartDate}}" max="9999-12">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 마감일</label>
+                                <input type="month" class="form-control" id="enddate" name="enddate"  value="{{.Project.SMEndDate}}" max="9999-12">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="addPayment">
+                        {{range $index, $payment := .Project.Payment}}
+                            <div class="row">
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="text-muted">총 매출 {{if ne $index 0}} {{addIntFunc $index 1}} {{end}}</label>
+                                        <input type="text" inputmode="numeric" class="form-control" id="payment{{$index}}" name="payment{{$index}}" value="{{decryptCostFunc $payment.Expenses true}}">
+                                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group">
+                                        <label class="text-muted">계약일 {{if ne $index 0}} {{addIntFunc $index 1}} {{end}}</label>
+                                        <input type="date" class="form-control" id="paymentdate{{$index}}" name="paymentdate{{$index}}" value="{{$payment.Date}}" max="9999-12-31">
+                                    </div>
+                                </div>
+                            </div>
+                        {{end}}
+                    </div>
+                    <div class="row">
+                        <input type="hidden" id="paymentNum" name="paymentNum" value="{{len .Project.Payment}}">
+                        <div class="col">
+                            <span id="paymentaddbtn" class="add float-right" onclick="addPaymentFunc();">총 매출 추가</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">감독</label>
+                                <input type="text" class="form-control" id="directorname" name="directorname" value="{{.Project.DirectorName}}">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">제작사</label>
+                                <input type="text" class="form-control" id="producername" name="producername" value="{{.Project.ProducerName}}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">계약 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="contractcuts" name="contractcuts" value="{{putCommaFunc .Project.ContractCuts}}">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group pb-2">
+                                <label class="text-muted">작업 컷수</label>
+                                <input type="text" inputmode="numeric" class="form-control" id="workingcuts" name="workingcuts" value="{{putCommaFunc .Project.WorkingCuts}}">
+                                <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-1"></div>
+                <div class="col">
+                    <div class="row">
+                        <div class="col">
+                            <div class="custom-control custom-checkbox pb-2">
+                                <input type="checkbox" class="custom-control-input" id="isfinished" name="isfinished" onclick="checkIsFinishedInEditFunc()" {{if eq .Project.IsFinished true}}checked{{end}}>
+                                <label class="custom-control-label text-muted" for="isfinished">정산 완료된 프로젝트</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-1"></div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="typeCheckbox1" name="typeCheckbox1" class="custom-control-input" value="true" disabled onclick="checkIsFinishedInEditFunc()">
+                            <label class="custom-control-label text-muted" for="typeCheckbox1">월별 합산 값으로 저장</label>
+                        </div>
+                        <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="typeCheckbox2" name="typeCheckbox1" class="custom-control-input" value="false" disabled onclick="checkIsFinishedInEditFunc()">
+                            <label class="custom-control-label text-muted" for="typeCheckbox2">최종 입력 값으로 저장</label>
+                        </div>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">총 내부비용</label>
+                        {{$tmp := decryptCostFunc .Project.TotalAmount true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="totalamount" name="totalamount" value="{{$tmp}}" {{if eq .Project.IsFinished false}}disabled{{end}}>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">내부인건비</label>
+                        <input type="text" inputmode="numeric" class="form-control" id="laborcost" name="laborcost" value="{{totalOfFinishedLaborCostFunc .Project.FinishedCost.LaborCost true}}" {{if eq .Project.IsFinished false }}disabled{{end}}>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">진행비</label>
+                        {{$tmp := decryptCostFunc .Project.FinishedCost.ProgressCost true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="progresscost" name="progresscost" value="{{$tmp}}" {{if eq .Project.IsFinished false}}disabled{{end}}>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">구매비</label>
+                        {{$tmp := decryptCostFunc .Project.FinishedCost.PurchaseCost true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="purchasecost" name="purchasecost" value="{{$tmp}}" {{if eq .Project.IsFinished false}}disabled{{end}}>
+                        <small class="form-text text-muted">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group pb-2">
+                        <label class="text-muted">경관실 입력 데이터</label>
+                        {{$tmp := decryptCostFunc .Project.SMDifference true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <input type="text" inputmode="numeric" class="form-control" id="difference" name="difference" value="{{$tmp}}" {{if eq .Project.IsFinished false}}disabled{{end}}>
+                        <small class="form-text text-muted">공통 노무비와 공통 경비를 합산한 금액을 적어주세요. 숫자만 입력 가능합니다.</small>
+                    </div>
+                </div>
+            </div>
+            <div class="row-sm-1"></div>
+            <div class="row pt-3">
+                <table name="projecttable" id="projecttable" class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-top-white border-right-gray border-bottom-white">날짜</th>
+                            <th class="border-top-white border-right-white border-bottom-white">Status</th>
+                            <th class="border-top-white border-right-white border-bottom-white">월별 매출</th>
+                            <th class="border-top-white border-right-gray border-bottom-white">진행비</th>
+                            <th class="border-top-white border-bottom-white">구매비</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $date := .Date}}
+                            <tr>
+                                <!-- 날짜 -->
+                                <td class="border-top-gray border-right-gray">{{stringToDateFunc $date}}</td>
+                                <!-- Status -->
+                                <td class="border-top-gray border-right-white">
+                                   <select name="{{$date}}status" id="{{$date}}status" class="form-control">
+                                    {{$pstatus := index $.Project.SMStatus $date}}
+                                       <option value="" {{if eq $pstatus  ""}}selected{{end}}></option>
+                                       {{range $status := $.Status}}
+                                       <option value="{{$status.ID}}" {{if eq $pstatus $status.ID}}selected{{end}}>{{$status.ID}}</option>
+                                       {{end}}
+                                   </select>
+                                </td>
+                                <!-- 월별 매출 -->
+                                <td class="border-top-gray border-right-white">
+                                    <div class="input-group">
+                                        {{$mp := decryptPaymentFunc (index $.Project.SMMonthlyPayment $date) true}}
+                                        {{if eq $mp "0"}}{{$mp = ""}}{{end}}
+                                        <input type="text" inputmode="numeric" class="form-control" id="{{$date}}monthlypayment" name="{{$date}}monthlypayment" value="{{$mp}}" readonly>
+                                        <div class="input-group-prepend">
+                                            <span class="btn-sm btn-darkmode finger" data-toggle="modal" data-target="#modal-setMonthlyPayment" onclick="setMonthlyPaymentModalFunc('{{$.Project.ID}}', '{{$date}}')">...</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <!-- 진행비 -->
+                                <td class="border-top-gray border-right-gray">
+                                    <!-- 비용이 비어있으면 빈칸으로 보여주고, 그렇지 않으면 복호화해서 보여준다. -->
+                                    <input type="text" inputmode="numeric" class="form-control" id="{{$date}}smprogresscost" name="{{$date}}smprogresscost"
+                                        {{if (index $.Project.SMMonthlyProgressCost $date)}}
+                                            value="{{decryptCostFunc (index $.Project.SMMonthlyProgressCost $date) true}}"
+                                        {{else}}
+                                            value=""
+                                        {{end}}>
+                                </td>
+                                <!-- 구매비 -->
+                                <td class="border-top-gray">
+                                    <div class="input-group">
+                                        <input type="text" inputmode="numeric" class="form-control" id="{{$date}}smpurchasecost" name="{{$date}}smpurchasecost" value="{{totalOfPurchaseCostFunc $.Project.SMMonthlyPurchaseCost $date false}}" readonly>
+                                        <div class="input-group-prepend">
+                                            <span class="btn-sm btn-darkmode finger" data-toggle="modal" data-target="#modal-setMonthlyPurchaseCost" onclick="setMonthlyPurchaseCostModalFunc('{{$.Project.ID}}', '{{$date}}')">...</span>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center pt-5">
+                <button type="submit" class="btn btn-outline-warning">Update</button>
+            </div>
+        </form>
+    </div>           
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

@@ -1,0 +1,111 @@
+{{define "navbar"}}
+<nav class="navbar navbar-expand-lg navbar-darkmode sticky-top">
+    <a class="navbar-brand" href="/">BUDGET</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+            <!-- Timelog 메뉴 -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Timelog
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/timelog-vfx">VFX</a>
+                    <a class="dropdown-item" href="/timelog-cm">CM</a>
+                    <a class="dropdown-item" href="/timelog-total">Total</a>
+                </div>
+            </li>
+
+            {{if ge .Token.AccessLevel 2}}
+            <!-- 결산 메뉴 -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    결산
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/smpayment-status">매출 현황</a>
+                    <a class="dropdown-item" href="/smvendor-status">외주 현황</a>
+                    <a class="dropdown-item" href="/smtotal-status">Total 현황</a>
+                    {{if eq .Token.AccessLevel 4}}
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="/smdetail-laborcost">세부 인건비</a>
+                    <a class="dropdown-item" href="/smtotal-laborcost">Total 인건비</a>
+                    {{end}}
+                </div>
+            </li>
+            {{end}}
+
+            <!-- 예산 메뉴 -->
+            <!-- <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    예산(개발 예정)
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/">Main_예산</a>
+                    <a class="dropdown-item" href="/">Shot / Asset</a>
+                </div>
+            </li> -->
+
+            <!-- admin 메뉴 -->
+            {{if ge .Token.AccessLevel 2}}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-danger" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Admin
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {{if eq .Token.AccessLevel 4}}
+                            <a class="dropdown-item" href="/users">Users</a>
+                            <a class="dropdown-item" href="/artists-vfx">Artists_VFX</a>
+                            <a class="dropdown-item" href="/artists-cm">Artists_CM</a>
+                            <div class="dropdown-divider"></div>
+                        {{end}}
+                            <label class="pl-2" style="color:#A7A59C">결산</label>
+                        {{if eq .Token.AccessLevel 4}}
+                            <a class="dropdown-item" href="/timelogs-sup">Timelogs_SUP</a>
+                        {{end}}
+                        <a class="dropdown-item" href="/projects">Projects</a>
+                        <a class="dropdown-item" href="/vendors">Vendors</a>
+                        <div class="dropdown-divider"></div>
+                        <label class="pl-2" style="color:#A7A59C">예산</label>
+                        <a class="dropdown-item" href="/bgprojects">Projects</a>
+                        <a class="dropdown-item" href="/shotasset">Shot / Asset</a>
+                        {{if eq .Token.AccessLevel 4}}
+                            <a class="dropdown-item" href="/bgteamsetting">Team Setting</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item text-danger" href="/adminsetting">Admin Setting</a>
+                        {{end}}
+                    </div>
+                </li>
+            {{end}}
+
+            {{if ge .Token.AccessLevel 1}}
+                <!-- Help 메뉴 -->
+                <li class="nav-item">
+                    <a class="nav-link" href="/help">Help</a>
+                </li>
+            {{end}}
+
+            <!-- Log 페이지 -->
+            {{if ge .Token.AccessLevel 2}}
+                <li class="nav-item">
+                    <a class="nav-link" href="/log">Log</a>
+                </li>
+            {{end}}
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <!-- user 메뉴 -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {{.Token.ID}}
+                </a>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/editprofile">Profile</a>
+                    <a class="dropdown-item" href="/signout">Sign out</a>
+                </div>
+            </li>
+        </ul>
+    </div>
+</nav>
+{{end}}

@@ -1,0 +1,80 @@
+{{define "smtotalstatus"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+            <div class="pt-3 pb-3">
+                <h2 class="section-heading text-muted text-center">전체 현황표</h2>
+            </div>
+        </div>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/export-smtotalstatus" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="col-sm-1 bd-highlight" style="padding-right:0">
+                    <input class="form-control" type="number" format="yyyy" value="{{.Year}}" onchange="self.location='smtotal-status?year=' + this.value">
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto">
+            <table name="smtotalstatustable" id="smtotalstatustable" class="table text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-right-white border-bottom-white" rowspan="2"></th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="12">{{.Year}}년</th>
+                        <th class="border-top-white border-bottom-white total" rowspan="2" style="min-width:120px;">Total</th>
+                    </tr>
+                    <tr>
+                        {{range $i, $d := .Dates}}
+                            {{$i = addIntFunc $i 1}}
+                            <th class="border-bottom-white border-right-gray" style="min-width:120px;">{{$i}}월</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border-right-white">매출</td>
+                        {{$tmp := len .Dates}}
+                        {{range $n, $d := .Dates}}
+                            <td {{if eq $n (addIntFunc $tmp -1)}} class="border-right-white text-right" {{else}} class="border-right-gray text-right" {{end}}>{{decryptCostFunc (index $.Payment $d) true}}</td>
+                        {{end}}
+                        <td class="total text-right">{{decryptCostFunc .CostSum.Payment true}}</td>
+                    </tr>
+                    <tr>
+                        <td class="border-top-gray border-right-white">외주비</td>
+                        {{$tmp := len .Dates}}
+                        {{range $n, $d := .Dates}}
+                            <td {{if eq $n (addIntFunc $tmp -1)}} class="border-top-gray border-right-white text-right" {{else}} class="border-top-gray border-right-gray text-right" {{end}}>{{decryptCostFunc (index $.Expenses $d) true}}</td>
+                        {{end}}
+                        <td class="border-top-gray total text-right">{{decryptCostFunc .CostSum.Expenses true}}</td>
+                    </tr>
+                    <tr>
+                        <td class="border-top-white border-right-white total">Total</td>
+                        {{$tmp := len .Dates}}
+                        {{range $n, $d := .Dates}}
+                            <td {{if eq $n (addIntFunc $tmp -1)}} class="border-top-white border-right-white text-right total" {{else}} class="border-top-white border-right-gray text-right total" {{end}}>{{decryptCostFunc (index $.Total $d) true}}</td>
+                        {{end}}
+                        <td class="border-top-white total text-right">{{decryptCostFunc .CostSum.Total true}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

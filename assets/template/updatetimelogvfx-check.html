@@ -1,0 +1,59 @@
+{{define "updatetimelogvfx-check"}}
+{{template "head"}}
+<body onload="sortCheckTableFunc('timelogCheckTable')">
+    {{template "navbar" .}}
+
+    <div class="container py-4 px-2">
+        <div class="col-lg-12 col-md-8 col-sm-12 mx-auto pb-2">
+            <div class="pt-3 pb-3">
+                <h2 class="text-muted text-center">Update VFX Timelog</h2>
+            </div>
+            <div class="pt-3 pb-3">
+                <h6 class="text-muted text-center">
+                    <label style="font-size:20px;color:darkorange">&#9888;</label>
+                    Update 버튼을 클릭하면 아래와 같이 <b style="color: darkgoldenrod">{{.Year}}년 {{.Month}}월</b>의 타임로그 정보가 업데이트됩니다.
+                </h6>
+            </div>
+        </div>
+
+        <form action="/updatetimelogvfx-submit?date={{.Year}}-{{.Month}}" method="POST">
+            <div class="col-lg-12 col-md-8 col-sm-12 mx-auto">
+                <table class="table table-sm text-center table-hover text-white" id="timelogCheckTable">
+                    <thead>
+                        <tr>
+                            <th>Shotgun ID</th>
+                            <th>이름</th>
+                            {{range $project := .Projects}}
+                                <th>{{$project}}</th>
+                            {{end}}
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {{range $artistID, $artistData := .ArtistDatas}}
+                            <tr>
+                                <td>{{$artistID}}</td>                                                    <!-- 아티스트 ID -->
+                                <td>{{$artistData.Name}}</td>                                             <!-- 아티스트 이름 -->
+                                {{range $project := $.Projects}}
+                                    <td>{{durationToTimeFunc (index $artistData.Timelogs $project)}}</td> <!-- 타임로그 데이터 -->
+                                {{end}}
+                            </tr>
+                        {{end}}
+                    </tbody>
+                </table>
+
+                <div class="text-center pt-4 pb-4">
+                    <button type="submit" class="btn btn-outline-danger">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

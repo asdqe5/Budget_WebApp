@@ -1,0 +1,176 @@
+{{define "help-timelog"}}
+    <!-- Timelog Help -->
+    <div class="p-5">
+        <h3 class="pt-5 pb-4 text-darkmode text-center">Timelog</h3>
+        <div class="row justify-content-center align-items-center m-3">
+            <div class="col-lg-8">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <input type="month" class="form-control" name="date" placeholder="yyyy-MM">        
+                        <select name="dept" id="dept" class="custom-select left-radius">
+                            <option value="Dept" selected>Dept</option>
+                        </select>
+                        <select name="team" id="team" class="custom-select left-radius">
+                            <option value="Team" selected>Team</option>
+                        </select>
+                    </div>
+                    <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="">
+                    <div class="input-group-append">
+                        <button class="btn btn-darkmode" id="button" title="검색합니다.">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center m-3">
+            <div class="col-lg-8">
+                <div class="m-3 mx-auto">
+                    <div class="d-flex bd-highlight">
+                        <div class="mr-auto bd-highlight">
+                            {{if ge .Token.AccessLevel 3}}
+                                <button class="btn btn-outline-warning btn-sm">Download</button>
+                            {{end}}
+                        </div>
+                        <div class="bd-highlight">
+                            <label class="text-muted">[업데이트된 시간: 2020-12-02 10:27:17]&nbsp;</label>
+                            <button class="btn btn-outline-danger btn-sm">Update Timelog</button>
+                            {{if ge .Token.AccessLevel 3}}
+                                <button class="btn btn-outline-danger btn-sm">+</button>
+                            {{end}}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center text-darkmode">
+            <p class="h6 font-weight-light pt-2">
+                <p class="h6 font-weight-light">날짜, 부서, 팀을 선택하거나 검색어를 이용해서 원하는 결과를 검색할 수 있습니다.</p>
+                <br>
+                {{if ge .Token.AccessLevel 3}}
+                    <p class="h6 font-weight-light"><span class="btn btn-outline-warning btn-sm">Download</span>
+                    : 타임로그 데이터를 엑셀 파일로 다운로드합니다.
+                    </p>
+                {{end}}
+                <p class="h6 font-weight-light"><span class="btn btn-outline-danger btn-sm">Update Timelog</span>
+                : 월별 결산 상태와 현재 시간을 기준으로 샷건에 타임로그를 가져와서 업데이트합니다.<br>
+                결산이 완료된 경우에는 Update할 수 없습니다.<br>
+                지난달이 결산완료인 경우 지난달의 타임로그를 Update하기 위해서는 AdminSetting을 확인해주세요.
+                </p>
+                {{if ge .Token.AccessLevel 3}}
+                    <p class="h6 font-weight-light"><span class="btn btn-outline-danger btn-sm">+</span>
+                    : 엑셀 파일을 임포트하여 타임로그를 업데이트합니다.<br>
+                    현재 달을 제외한 달에만 가능합니다. 현재 달의 타임로그 업데이트는 Update 버튼을 이용해주세요.
+                    </p>
+                {{end}}
+                <!-- 모달창 목록 -->
+                <h5 class="pt-5 text-darkmode text-left"><모달창 목록></h5>
+                <div class="border p-3" style="border-color: #f7f7f97c !important;">
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="nav flex-column nav-pills" id="errortab" role="tablist" aria-orientation="vertical">
+                                <a class="nav-link font-weight-bold active" data-toggle="pill" href="#noneartists" role="tab" aria-controls="noneartists" aria-selected="true">None Artists Error</a>
+                                <a class="nav-link font-weight-bold" data-toggle="pill" href="#updatetimelog" role="tab" aria-controls="updatetimelog" aria-selected="true">Update Timelog</a>
+                                <a class="nav-link font-weight-bold" data-toggle="pill" href="#updatetimeloglastmonth" role="tab" aria-controls="updatetimeloglastmonth" aria-selected="true">Update Timelog - 지난달</a>
+                                <a class="nav-link font-weight-bold" data-toggle="pill" href="#updatetimeloglastmonthadmin" role="tab" aria-controls="updatetimeloglastmonthadmin" aria-selected="true">Update Timelog - 지난달<span class="text-danger"> (Admin)</span></a>                                
+                                <a class="nav-link font-weight-bold" data-toggle="pill" href="#finishedtimelog" role="tab" aria-controls="finishedtimelog" aria-selected="true">Timelog Of Finished Project</a>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="tab-content">
+                                <!-- None Artists Error -->
+                                <div class="tab-pane fade show active" id="noneartists" role="tabpanel" aria-labelledby="noneartists-tab">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <img src="/assets/img/noneartists.png" alt="noneartists">
+                                        </div>
+                                        <div class="col">
+                                            <p class="font-weight-bold pb-3">
+                                                등록되지 않은 아티스트가 있는 경우 발생하는 에러
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                <span class="btn btn-outline-warning">Add Artists</span>
+                                                : 아티스트를 추가하는 페이지로 이동합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Update Timelog -->
+                                <div class="tab-pane fade" id="updatetimelog" role="tabpanel" aria-labelledby="updatetimelog-tab">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <img src="/assets/img/updatetimelog.png" alt="updatetimelog">
+                                        </div>
+                                        <div class="col">
+                                            <p class="font-weight-bold pb-3">
+                                                타임로그 업데이트 창 - 지난달 결산이 완료된 경우
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                자동으로 업데이트가 됩니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Update Timelog - 지난달 -->
+                                <div class="tab-pane fade" id="updatetimeloglastmonth" role="tabpanel" aria-labelledby="updatetimeloglastmonth-tab">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <img src="/assets/img/updatetimelogv3.png" alt="updatetimelogv3">
+                                        </div>
+                                        <div class="col">
+                                            <p class="font-weight-bold pb-3">
+                                                타임로그 업데이트 창 - 지난달 결산이 완료되지 않은 경우
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                Admin 권한을 가진 계정이 지난달의 결산이 완료되었다고<br>
+                                                설정해줘야 업데이트를 할 수 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Update Timelog - 지난달(Admin) -->
+                                <div class="tab-pane fade" id="updatetimeloglastmonthadmin" role="tabpanel" aria-labelledby="updatetimeloglastmonthadmin-tab">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <img src="/assets/img/updatetimelogv2.png" alt="updatetimelogv2">
+                                        </div>
+                                        <div class="col">
+                                            <p class="font-weight-bold pb-3">
+                                                타임로그 업데이트 창 - 지난달 결산이 완료되지 않은 경우 <span class="text-danger">(Admin)</span>
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                <span class="btn btn-outline-danger">AdminSetting</span>
+                                                : AdminSetting 페이지로 이동합니다.
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                <span class="btn btn-outline-warning">Update</span>
+                                                : 지난달과 이번달의 타임로그를 모두 업데이트합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Timelog Of Finished Project -->
+                                <div class="tab-pane fade" id="finishedtimelog" role="tabpanel" aria-labelledby="finishedtimelog-tab">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <img src="/assets/img/finishedtimelog.png" alt="finishedtimelog">
+                                        </div>
+                                        <div class="col">
+                                            <p class="font-weight-bold pb-3">
+                                                정산 완료된 프로젝트에 타임로그가 업데이트된 경우
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                Admin 권한을 가진 계정이 타임로그를 어떻게 처리할 것인지<br>
+                                                설정해줘야 업데이트를 할 수 있습니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </div>
+    </div>
+{{end}}

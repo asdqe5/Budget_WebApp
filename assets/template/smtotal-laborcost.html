@@ -1,0 +1,82 @@
+{{define "smtotal-laborcost"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/export-smtotallaborcost" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="col-sm-1 bd-highlight" style="padding-right:0">
+                    <input class="form-control" type="number" format="yyyy" value="{{.Year}}" onchange="self.location='smtotal-laborcost?year=' + this.value">
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto freeze-table">
+            <table name="smtotallaborcosttable" id="smtotallaborcosttable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-right-white border-bottom-white" rowspan="2">프로젝트</th>
+                        <th class="border-top-white border-right-white border-bottom-gray" colspan="12">{{.Year}}년</th>
+                        <th class="border-top-white border-bottom-white total" rowspan="2" style="min-width:120px;">Total</th>
+                    </tr>
+                    <tr>
+                        {{range $i, $d := .Dates}}
+                            {{$i = addIntFunc $i 1}}
+                            <th class="border-bottom-white border-right-gray" style="min-width:120px;">{{$i}}월</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $p := .Projects}}
+                        <tr>
+                            <td class="border-top-gray border-right-white">{{$p.Name}}</td>
+                            {{$tmp := len $.Dates}}
+                            {{range $n, $d := $.Dates}}
+                                <td {{if eq $n (addIntFunc $tmp -1)}} class="border-top-gray border-right-white text-right" {{else}} class="border-top-gray border-right-gray text-right" {{end}}>{{decryptCostFunc (index $p.MonthlyCost $d) true}}</td>
+                            {{end}}
+                            <td class="border-top-gray text-right total">{{decryptCostFunc $p.Total true}}</td>
+                        </tr>
+                    {{end}}
+                    <tr>
+                        <td class="border-top-white border-right-white total">Total</td>
+                        {{$tmp := len $.Dates}}
+                        {{range $n, $d := .Dates}}
+                            <td {{if eq $n (addIntFunc $tmp -1)}} class="border-top-white border-right-white text-right total" {{else}} class="border-top-white border-right-gray text-right total" {{end}}>{{decryptCostFunc (index $.DateSum $d) true}}</td>
+                        {{end}}
+                        <td class="border-top-white text-right total">{{decryptCostFunc .Total true}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "columnNum": 1, /* column 1개 고정 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

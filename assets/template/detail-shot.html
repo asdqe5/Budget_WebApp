@@ -1,0 +1,94 @@
+{{define "detail-shot"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <!-- 프로젝트 이름 및 예산안 타입 -->
+    <div class="pt-5 pb-5">
+        <h3 class="text-center font-weight-bold section-heading text-muted">[ {{.Name}} - {{.BGType}} ]</h3>
+    </div>
+    <div class="container py-4 px-2" style="max-width: 80%;">
+        <div class="mx-auto pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportdetailshot?id={{.ID}}&bgtype={{.BGType}}&type={{.Type}}" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="mx-auto freeze-table">
+            <table class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white {{if eq .Type "drama"}} border-right-gray {{else}} border-right-white {{end}}" rowspan="2">Shot Name</th>
+                        {{if eq .Type "drama"}}
+                            <th class="border-top-white border-bottom-white border-right-white" rowspan="2">Episode</th>
+                        {{end}}
+                        <th class="border-top-white border-bottom-gray" colspan="{{len .TaskList}}">Task</th>
+                    </tr>
+                    <tr>
+                        {{range $i, $task := .TaskList}}
+                            <th class="border-bottom-white {{if ne (addIntFunc $i 1) (len $.TaskList)}} border-right-gray {{end}}" style="min-width: 60px;">{{$task}}</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $shot := .ShotList}}
+                        <tr>
+                            <td class="border-top-gray {{if eq $.Type "drama"}} border-right-gray {{else}} border-right-white {{end}}">{{$shot.Name}}</td>
+                            {{if eq $.Type "drama"}}
+                                <td class="border-top-gray border-right-white">{{$shot.Note}}</td>
+                            {{end}}
+                            {{range $i, $task := $.TaskList}}
+                                {{$bid := index $shot.Manday $task}}
+                                {{if ne $bid 0.0}}
+                                    <td class="border-top-gray {{if ne (addIntFunc $i 1) (len $.TaskList)}} border-right-gray {{end}}">{{$bid}}</td>
+                                {{else}}
+                                    <td class="border-top-gray {{if ne (addIntFunc $i 1) (len $.TaskList)}} border-right-gray {{end}}"></td>
+                                {{end}}
+                            {{end}}
+                        </tr>
+                    {{end}}
+                    <tr>
+                        <td class="border-top-white border-right-white total" {{if eq .Type "drama"}} colspan="2" {{end}}>Total</td>
+                        {{range $i, $task := .TaskList}}
+                            {{$tbid := index $.TotalBid $task}}
+                            {{if eq $tbid 0.0}}
+                                <td class="border-top-white {{if ne (addIntFunc $i 1) (len $.TaskList)}} border-right-gray {{end}} total"></td>
+                            {{else}}
+                                <td class="border-top-white {{if ne (addIntFunc $i 1) (len $.TaskList)}} border-right-gray {{end}} total">{{$tbid}}</td>
+                            {{end}}
+                        {{end}}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center pt-5 pb-5">
+            <input class="btn btn-darkmode" type="button" value="BACK" onclick="history.go(-1)">
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+</html>
+{{end}}

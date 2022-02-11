@@ -1,0 +1,201 @@
+{{define "bgdetail"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <!-- 프로젝트 기본 정보 -->
+    <div class="pt-5 pb-5">
+        <h3 class="text-center font-weight-bold section-heading text-muted">[ 기적 - 시나리오 ]</h3>
+
+        <div class="row pt-4">
+            <div class="col">
+                <p class="text-right font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">2021년 4월 ~ 2021년 8월 &nbsp;/&nbsp; 작업 컷수 : 130 컷</p>
+            </div>
+            <div class="col">
+                <p class="text-left font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">감독 : 이계벽 &nbsp;/&nbsp; 제작사 : RD101</p>
+            </div>
+        </div>
+        <div class="row pt-2">
+            <div class="col">
+                <p class="text-right font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">총 매출 : 100,000,000 원</p>
+            </div>
+            <div class="col">
+                <p class="text-left font-weight-bold text-muted" style="font-size:18px;margin-bottom:0">계약일 : 2021년 3월 1일</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 합계 테이블 -->
+    <div class="container py-4 px-2" style="max-width:80%">
+        <div class="mx-auto pb-5">
+            <table name="detailsumtable" id="detailsumtable" class="table table-sm text-center table-hover text-white" style="table-layout: fixed;">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="3">매출</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="6">총 지출</th>
+                        <th class="border-top-white border-bottom-white" rowspan="3">수익</th>
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-gray border-right-gray" colspan="3">내부 인건비</th>
+                        <th class="border-bottom-white border-right-gray" rowspan="2">진행비</th>
+                        <th class="border-bottom-white border-right-gray" rowspan="2">외주비</th>
+                        <th class="border-bottom-white border-right-white" rowspan="2">합계</th>
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">VFX</th>
+                        <th class="border-bottom-white">CM</th>
+                        <th class="border-bottom-white">Retake율</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="font-size: large;" class="border-bottom-white border-right-white text-right" rowspan="2">100,000,000</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right" rowspan="2">45,000,000</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right" rowspan="2">5,000,000</td>
+                        <td style="font-size: large;" class="border-bottom-gray border-right-gray">10 %</td>
+                        <td style="font-size: large;" class="border-bottom-gray border-right-gray">5 %</td>
+                        <td style="font-size: large;" class="border-bottom-gray border-right-gray">30 %</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-white text-right" rowspan="2">90,000,000</td>
+                        <td style="font-size: large;" class="border-bottom-white text-right" rowspan="2">10,000,000</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">5,000,000</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">5,000,000</td>
+                        <td style="font-size: large;" class="border-bottom-white border-right-gray text-right">30,000,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="mx-auto pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    <label class="text-muted">[업데이트된 시간: &nbsp;2021-04-15 12:34:57]&nbsp;</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto">
+            <table name="projectdetailtable" id="projectdetailtable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2" colspan="2">본부</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">구분</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="2">Qty</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="2">M-Day</th>
+                        <th class="border-top-white border-bottom-gray">Cost</th>
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">Assets Qty</th>
+                        <th class="border-bottom-white border-right-white">Shot Qty</th>
+                        <th class="border-bottom-white border-right-gray">Assets M-Day</th>
+                        <th class="border-bottom-white border-right-white">Shot M-Day</th>
+                        <th>M-Day Cost</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $hIndex, $head := .TeamSetting.Headquarters}}
+                        {{$bgPartInfo := getBGPartInfoMapFunc $.TeamSetting $head}}
+                        {{$index := 0}}
+                        <!-- 본부별 부서 -->
+                        {{range $dIndex, $dept := index $.TeamSetting.Departments $head}}
+                            {{range $pIndex, $part := $dept.Parts}}
+                                <tr>
+                                    <!-- 본부 -->
+                                    {{if eq $index 0}}
+                                        <td class="border-top-white border-right-gray" rowspan="{{addIntFunc $bgPartInfo.total 1}}">{{$head}}</td>
+                                    {{end}}
+                                    <!-- 본부 - 부서 -->
+                                    {{if eq $pIndex 0}}
+                                        <td class="border-top-gray border-right-white" rowspan="{{len $dept.Parts}}">{{$dept.Name}}</td>
+                                    {{end}}
+                                    <!-- 구분 -->
+                                    <td class="border-top-gray border-right-white">{{$part.Name}}</td>
+                                    <!-- Assets Qty -->
+                                    <td class="border-top-gray border-right-gray"></td>
+                                    <!-- Shot Qty -->
+                                    <td class="border-top-gray border-right-white"></td>
+                                    <!-- Assets M-Day -->
+                                    <td class="border-top-gray border-right-gray"></td>
+                                    <!-- Shot M-Day -->
+                                    <td class="border-top-gray border-right-white"></td>
+                                    <!-- M-Day Cost -->
+                                    {{if eq $index 0}}
+                                        <td class="border-top-gray text-right" rowspan="{{$bgPartInfo.dept}}">0</td>
+                                    {{end}}
+                                </tr>
+                                {{$index = addIntFunc $index 1}}
+                            {{end}}
+                        {{end}}
+
+                        <!-- 본부에 해당하는 슈퍼바이저, 프로덕션, 매니지먼트 -->
+                        {{range $cIndex, $control := index $.TeamSetting.Controls $head}}
+                            {{range $pIndex, $part := $control.Parts}}
+                                <tr>
+                                    <!-- 본부 -->
+                                    {{if eq $index 0}}
+                                        <td class="border-top-white border-right-gray" rowspan="{{addIntFunc $bgPartInfo.total 1}}">{{$head}}</td>
+                                    {{end}}
+                                    <!-- 본부 - 부서 -->
+                                    {{if eq $pIndex 0}}
+                                        <td class="border-top-gray border-right-white" rowspan="{{len $control.Parts}}">{{$control.Name}}</td>
+                                    {{end}}
+                                    <!-- 구분 -->
+                                    <td class="border-top-gray border-right-white">{{$part.Name}}</td>
+                                    <!-- Assets Qty -->
+                                    <td class="border-top-gray border-right-gray"></td>
+                                    <!-- Shot Qty -->
+                                    <td class="border-top-gray border-right-white"></td>
+                                    <!-- Assets M-Day -->
+                                    <td class="border-top-gray border-right-gray"></td>
+                                    <!-- Shot M-Day -->
+                                    <td class="border-top-gray border-right-white"></td>
+                                    <!-- M-Day Cost -->
+                                    {{if or (eq $index 0) (eq $index $bgPartInfo.dept)}}
+                                        <td class="border-top-gray text-right" rowspan="{{$bgPartInfo.control}}">0</td>
+                                    {{end}}
+                                </tr>
+                                {{$index = addIntFunc $index 1}}
+                            {{end}}
+                        {{end}}
+
+                        <!-- 본부별 합계 -->
+                        {{if eq (addIntFunc $hIndex 1) (len $.TeamSetting.Headquarters)}}
+                            <tr>
+                                <td colspan="2" class="border-top-white border-right-white total">합계</td>
+                                <td class="border-top-white border-right-gray total"></td>
+                                <td class="border-top-white border-right-white total"></td>
+                                <td class="border-top-white border-right-gray total"></td>
+                                <td class="border-top-white border-right-white total"></td>
+                                <td class="border-top-white text-right total">0</td>
+                            </tr>
+                        {{else}}
+                            <tr>
+                                <td colspan="2" class="border-top-white border-bottom-white border-right-white total">합계</td>
+                                <td class="border-top-white border-bottom-white border-right-gray total"></td>
+                                <td class="border-top-white border-bottom-white border-right-white total"></td>
+                                <td class="border-top-white border-bottom-white border-right-gray total"></td>
+                                <td class="border-top-white border-bottom-white border-right-white total"></td>
+                                <td class="border-top-white border-bottom-white text-right total">0</td>
+                            </tr>
+                        {{end}}
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+</html>
+{{end}}

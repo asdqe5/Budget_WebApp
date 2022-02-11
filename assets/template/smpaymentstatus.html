@@ -1,0 +1,126 @@
+{{define "smpaymentstatus"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+            <div class="pt-3 pb-3">
+                <h2 class="section-heading text-muted text-center">매출 현황표</h2>
+            </div>
+        </div>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/export-smpaymentstatus" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="col-sm-1 bd-highlight" style="padding-right:0">
+                    <input class="form-control" type="number" format="yyyy" value="{{.Year}}" onchange="self.location='smpayment-status?year=' + this.value">
+                </div>
+            </div>
+        </div>
+
+        <div class="mx-auto table-responsive freeze-table">
+            <table name="smpaymentstatustable" id="smpaymentstatustable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-bottom-white border-top-white border-right-gray" rowspan="2">Status</th>
+                        <th class="border-bottom-white border-top-white border-right-gray" rowspan="2">프로젝트</th>
+                        <th class="border-bottom-white border-top-white border-right-gray" rowspan="2">제작사</th>
+                        <th class="border-bottom-white border-top-white border-right-white" rowspan="2">감독</th>
+                        <th class="border-bottom-white border-top-white border-right-gray" rowspan="2">계약일</th>
+                        <th class="border-bottom-white border-top-white border-right-white" rowspan="2">계약 금액</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="12">{{.Year}}년</th>
+                        <th class="border-bottom-white border-top-white total" rowspan="2" style="min-width:120px;">Total</th>
+                    </tr>
+                    <tr>
+                        {{range $i, $d := .Dates}}
+                        {{$i = addIntFunc $i 1}}
+                        <th class="border-right-gray border-bottom-white" style="min-width:120px;">{{$i}}월</th>
+                        {{end}}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $p := .Projects}}
+                        {{$pmlen := len $p.Payment}}
+                        {{range $n, $pm := $p.Payment}}
+                            <tr>
+                                {{if eq $n 0}}
+                                    {{$s := ""}}
+                                    {{if eq $p.IsFinished true}}
+                                        {{$s = getLastStatusOfProjectFunc $p}}
+                                    {{else}}
+                                        {{$s = getThisMonthStatusOfProjectFunc $p}}
+                                    {{end}}
+                                    {{$ps := getStatusFunc $.Status $s}}
+                                    <td class="border-top-gray border-right-gray" rowspan="{{$pmlen}}" style="background-color: {{$ps.BGColor}}; color: {{$ps.TextColor}};">{{$ps.ID}}</td>       <!-- 프로젝트의 마지막 상태 -->
+                                    <td class="border-top-gray border-right-gray" rowspan="{{$pmlen}}">{{$p.Name}}</td>                                                                           <!-- 프로젝트 -->
+                                    <td class="border-top-gray border-right-gray" rowspan="{{$pmlen}}">{{$p.ProducerName}}</td>                                                                   <!-- 제작사 -->
+                                    <td class="border-top-gray border-right-white" rowspan="{{$pmlen}}">{{$p.DirectorName}}</td>                                                                   <!-- 감독 -->
+                                {{end}}
+                                <td class="border-top-gray border-right-gray">{{stringToDateFunc $pm.Date}}</td>                                                             <!-- 매출 계약일 -->
+                                <td class="border-top-gray border-right-white text-right" style="font-weight: bold;">{{decryptCostFunc $pm.Expenses true}}</td>              <!-- 매출 계약 금액 -->
+                                {{if eq $n 0}}
+                                    {{$tmplen := len $.Dates}}
+                                    {{range $num, $d := $.Dates}}
+                                        {{$mpInfo := getMonthlyPaymentInfoFunc $p.SMMonthlyPayment $d}}
+                                        {{$payment := decryptCostFunc $mpInfo.payment true}}
+                                        {{if ne $payment "0"}}
+                                            <td rowspan="{{$pmlen}}" {{if eq $num (addIntFunc $tmplen -1)}} class="border-top-gray border-right-white text-right" {{else}} class="border-top-gray border-right-gray text-right" {{end}} {{ if eq $mpInfo.in "true" }} style="font-weight: bold; color: #ecc585;" {{end}} {{if ne $mpInfo.tooltip "" }} data-toggle="tooltip" data-placement="top" title="{{$mpInfo.tooltip}}" {{end}}>{{$payment}}</td>
+                                        {{else}}
+                                            <td rowspan="{{$pmlen}}" {{if eq $num (addIntFunc $tmplen -1)}} class="border-top-gray border-right-white text-right" {{else}} class="border-top-gray border-right-gray text-right" {{end}}></td>
+                                        {{end}}
+                                    {{end}}
+                                    {{$tmp := decryptCostFunc (index $.TotalProjectPaymentMap $p.ID) true}}
+                                    {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                                    <td rowspan="{{$pmlen}}" class="border-top-gray total text-right">{{$tmp}}</td>
+                                {{end}}
+                            </tr>
+                        {{end}}
+                    {{end}}
+                    <tr>
+                        <td class="border-top-white border-right-gray total" colspan="5">Total</td>
+                        <td class="border-top-white border-right-white text-right total">{{decryptCostFunc .TotalPayment true}}</td>
+                        {{$tmplen := len $.Dates}}
+                        {{range $num, $d := $.Dates}}
+                            {{$tmp := decryptCostFunc (index $.TotalMonthlyPaymentMap $d) true}}
+                            {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                            <td {{if eq $num (addIntFunc $tmplen -1)}} class="border-top-white border-right-white text-right total" {{else}} class="border-top-white border-right-gray text-right total" {{end}}>{{$tmp}}</td>
+                        {{end}}
+                        {{$tmp := decryptCostFunc .SumPayment true}}
+                        {{if eq $tmp "0"}}{{$tmp = ""}}{{end}}
+                        <td class="border-top-white total text-right">{{$tmp}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "columnNum": 6, /* column 6개 고정 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

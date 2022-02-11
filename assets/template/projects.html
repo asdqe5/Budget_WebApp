@@ -1,0 +1,138 @@
+{{define "projects"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-project" .}}
+    <input type="hidden" id="token" value="{{.User.Token}}">
+    <div class="container py-4 px-2" style="max-width: 90%;">
+        <form action="/searchprojects" method="POST">
+
+            <div class="row justify-content-center align-items-center m-3">
+                <div class="col-lg-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <input type="month" class="form-control" name="date" value="{{.Date}}" max="9999-12">
+                        </div>
+                        <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="{{.SearchWord}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-darkmode" id="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center align-items-center ml-3 mr-3">
+                <div class="pl-3 pr-3">
+                    <input type="hidden" id="status" name="status" value="{{.SelectedStatus}}">
+                    <div class="col">
+                        {{range $s := .Status}}
+                            <span class="btn btn-sm" onclick="setStatusCheckBoxFunc('status-checkbox-{{$s.ID}}')" style="background-color: {{$s.BGColor}}; color: {{$s.TextColor}};">
+                                <input type="checkbox" id="status-checkbox-{{$s.ID}}" value="{{$s.ID}}" {{if hasStatusFunc $.SelectedStatus $s.ID}} checked {{end}}>
+                                <a>{{$s.ID}}</a>
+                            </span>
+                        {{end}}
+                    </div>
+                </div>
+                <div class="p-2 ml-2 bd-highlight align-self-center">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="excluderndproject" name="excluderndproject" {{ if eq $.ExcludeRNDProject "true" }} checked {{end}}>
+                        <label class="form-check-label text-muted" for="excluderndproject">RND, ETC 프로젝트 제외</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportprojects" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="db-highlight mr-2">
+                    {{if ge .Token.AccessLevel 3}}
+                    <button type="button" id="updateprojects" class="btn btn-sm btn-outline-danger" data-toggle="modal" data-target="#modal-checkupdateprojects">Update Projects</button>
+                    {{end}}
+                </div>
+                <div class="bd-highlight">
+                    {{if ge .Token.AccessLevel 3}}
+                    <a href="/addproject" class="btn btn-outline-warning btn-sm">+</a>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+        <div class="mx-auto freeze-table">
+            <!-- 결산 테이블 -->
+            <table name="projecttable" id="projecttable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">Status</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">ID</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">이름</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">작업 기간</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="2">컷수 정보</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">총 매출</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">진행비</th>
+                        <th class="border-top-white border-bottom-white {{if ge $.Token.AccessLevel 3}} border-right-white {{end}}" rowspan="2">구매비</th>
+                        {{if ge $.Token.AccessLevel 3}}
+                            <th class="border-top-white border-bottom-white" rowspan="2"></th>
+                        {{end}}
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">계약 컷수</th>
+                        <th class="border-bottom-white border-right-white">작업 컷수</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range $project := .Projects}}
+                        <tr>
+                            {{$s := index $project.SMStatus $.Date}}
+                            {{$ps := getStatusFunc $.Status $s}}
+                            <td class="border-top-gray border-right-gray" style="background-color: {{$ps.BGColor}}; color: {{$ps.TextColor}};">{{$ps.ID}}</td>
+                            <td class="border-top-gray border-right-gray">{{$project.ID}}</td>
+                            <td class="border-top-gray border-right-gray">{{$project.Name}}</td>
+                            <td class="border-top-gray border-right-white">{{stringToDateFunc $project.StartDate}} ~ {{stringToDateFunc $project.SMEndDate}}</td>
+                            <td class="border-top-gray border-right-gray">{{putCommaFunc $project.ContractCuts}}</td>
+                            <td class="border-top-gray border-right-white">{{putCommaFunc $project.WorkingCuts}}</td>
+                            <td class="border-top-gray border-right-white text-right">{{decryptPaymentFunc $project.Payment true}}</td>
+                            <td class="border-top-gray border-right-gray text-right">{{decryptCostFunc (index $project.SMMonthlyProgressCost $.Date) true}}</td>
+                            <td class="border-top-gray {{if ge $.Token.AccessLevel 3}} border-right-white {{end}} text-right">{{totalOfPurchaseCostFunc $project.SMMonthlyPurchaseCost $.Date true}}</td>
+                            {{if ge $.Token.AccessLevel 3}}
+                                <td class="border-top-gray">
+                                    <a class="finger badge badge-warning" href="/edit-projectsm?id={{$project.ID}}&date={{$.Date}}">Edit</a>
+                                    {{if eq $.Token.AccessLevel 4}}
+                                        <span class="finger badge badge-danger" data-toggle="modal" data-target="#modal-rmproject" onclick="setRmProjectModalFunc('{{$project.ID}}', '{{$project.Name}}')">Del</span>
+                                    {{end}}
+                                </td>
+                            {{end}}
+                        </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

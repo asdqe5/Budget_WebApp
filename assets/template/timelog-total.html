@@ -1,0 +1,163 @@
+{{define "timelog-total"}}
+{{template "head"}}
+<body onload="sortTotalTableFunc('timelogtable-total', 1)">
+    {{template "navbar" .}}
+    {{template "modal-timelog" .}}
+    <input type="hidden" id="token" value="{{.User.Token}}">
+    <div class="container py-4 px-2" style="max-width:80%">
+        <form action="/searchtimelog-total" method="POST">
+            <div class="row justify-content-center align-items-center m-3">
+                <div class="col-lg-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <input type="month" class="form-control" name="date" value={{.Date}} max="9999-12">
+                            <select name="dept" id="dept" class="custom-select left-radius" onchange="changeTotalTeamComboFunc(document.getElementById('dept').value)">
+                                <option value="" {{if eq .SelectedDept "" }}selected{{end}}>All</option>
+                                {{range $dept := .Depts}}
+                                <option value="{{$dept}}" {{if eq $.SelectedDept $dept }}selected{{end}}>{{$dept}}</option>
+                                {{end}}
+                            </select>
+                            <select name="team" id="team" class="custom-select left-radius">
+                                <option value="" {{if eq .SelectedTeam "" }}selected{{end}}>All</option>
+                                {{range $team := .Teams}}
+                                <option value="{{$team}}" {{if eq $.SelectedTeam $team }}selected{{end}}>{{$team}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="{{.SearchWord}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-darkmode" id="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="mx_auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exporttimelog-total" method="POST">
+                        {{if ge .Token.AccessLevel 3}}
+                        <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                {{if ge .Token.AccessLevel 1}}
+                <div class="bd-highlight">
+                    <label class="text-muted">[업데이트된 시간: &nbsp;{{changeDateFormatFunc .UpdatedTime}}&nbsp;/&nbsp;타임로그 업데이트는 월간 타임로그 페이지에서 가능합니다]</label>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        <div>
+            <div class="mx-auto table-responsive freeze-table">
+                <table name="timelogtable-total" id="timelogtable-total" class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-right-gray border-top-white border-bottom-white finger table-header-sorted" id="th0" onclick="sortTotalTableFunc('timelogtable-total', 0)">ID</th>
+                            <th class="border-right-white border-top-white border-bottom-white finger table-header-sorted" id="th1" onclick="sortTotalTableFunc('timelogtable-total', 1)">이름</th>
+                            {{$tmp:= len .Projects}}
+                            {{range $n, $project := .Projects}}
+                                <th {{if eq $n (addIntFunc $tmp -1)}} class="border-right-white border-top-white border-bottom-white" {{else}} class="border-right-gray border-bottom-white border-top-white" {{end}}>{{$project}}</th>
+                            {{end}}
+                            <th class="border-bottom-white border-top-white total">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{range $artistID, $artistData := .VFXArtistDatas}}
+                        <tr>
+                            <td class="border-top-gray border-right-gray table-header-sorted">{{$artistID}}</td>
+                            <td class="border-top-gray border-right-white table-header-sorted">{{$artistData.Name}}</td>
+                            {{$tmp:= len $.Projects}}
+                            {{range $n, $project := $.Projects}}
+                                <td {{if eq $n (addIntFunc $tmp -1)}} class="border-top-gray border-right-white" {{else}} class="border-top-gray border-right-gray" {{end}}>{{durationToTimeFunc (index $artistData.Timelogs $project)}}</td>
+                            {{end}}
+                            <td class="border-top-gray total">{{durationToTimeFunc $artistData.TotalDuration}}</td>
+                        </tr>
+                        {{end}}
+
+                        {{$num := 0}}
+                        {{range $artistID, $artistData := .CMArtistDatas}}
+                            {{if eq $num 0}}
+                                <tr>
+                                    <td style="font-size: 0px; border-top: 1px solid rgb(255, 255, 255); border-bottom: 1px solid rgb(255, 255, 255); height: 1px; background-color:#2e2d2d">cm</td>
+                                    <td style="font-size: 0px; border-top: 1px solid rgb(255, 255, 255); border-bottom: 1px solid rgb(255, 255, 255); height: 1px; background-color:#2e2d2d">a</td>
+                                    <td style="border-top: 1px solid rgb(255, 255, 255); border-bottom: 1px solid rgb(255, 255, 255); height: 1px; background-color:#2e2d2d" colspan="{{len $.Projects}}"></td>
+                                    <td style="border-top: 1px solid rgb(255, 255, 255); border-bottom: 1px solid rgb(255, 255, 255); height: 1px; background-color:#2e2d2d"></td>
+                                </tr>
+                            {{end}}
+                            {{$num = addIntFunc $num 1}}
+                        <tr>
+                            <td class="border-top-gray border-right-gray table-header-sorted">{{$artistID}}</td>
+                            <td class="border-top-gray border-right-white table-header-sorted">{{$artistData.Name}}</td>
+                            {{$tmp:= len $.Projects}}
+                            {{range $n, $project := $.Projects}}
+                                <td {{if eq $n (addIntFunc $tmp -1)}} class="border-top-gray border-right-white" {{else}} class="border-top-gray border-right-gray" {{end}}>{{durationToTimeFunc (index $artistData.Timelogs $project)}}</td>
+                            {{end}}
+                            <td class="border-top-gray total">{{durationToTimeFunc $artistData.TotalDuration}}</td>
+                        </tr>
+                        {{end}}
+                        <tr>
+                            <td class="border-top-white border-right-white total" colspan="2">Total</td>
+                            {{$tmp:= len $.Projects}}
+                            {{range $n, $project := .Projects}}
+                                <td {{if eq $n (addIntFunc $tmp -1)}} class="border-right-white border-top-white total" {{else}} class="border-right-gray border-top-white total" {{end}}>{{durationToTimeFunc (index $.ProjectDuration $project)}}</td>
+                            {{end}}
+                            <td class="border-top-white total">{{durationToTimeFunc .TotalDuration}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<!-- DB에 저장되지 않은 아티스트들 -->
+{{if .NoneArtists}}
+    <script type="text/javascript">
+        document.getElementById("modal-total-noneartists-id").value = "{{listToStringFunc .NoneArtists false}}"
+        $(window).on('load', function () {
+            $("#modal-total-noneartists").modal("show");
+        });
+    </script>
+{{end}}
+
+<!-- DB에 저장되지 않은 프로젝트들 -->
+{{if .NoneProjects}}
+    {{if ge .Token.AccessLevel 3}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneprojects-id").value = "{{listToStringFunc .NoneProjects false}}"
+            document.getElementById("modal-noneprojects-btn").setAttribute("onclick", "self.location='addproject'")
+            $(window).on('load', function () {
+                $("#modal-noneprojects").modal("show");
+            })
+        </script>
+    {{else}}
+        <script type="text/javascript">
+            document.getElementById("modal-noneprojects-id").value = "{{listToStringFunc .NoneProjects false}}"
+            $(window).on('load', function () {
+                $("#modal-noneprojects").modal("show");
+            })
+        </script>
+    {{end}}
+{{end}}
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "columnNum": 2,
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+</html>
+{{end}}

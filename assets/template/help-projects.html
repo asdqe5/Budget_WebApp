@@ -1,0 +1,174 @@
+{{define "help-projects"}}
+    <!-- Project Help -->
+    <div class="p-5">
+        <h3 class="pt-5 pb-4 text-darkmode text-center">Project</h3>
+
+        <div class="row justify-content-center align-items-center m-3">
+            <div class="col-lg-8">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <input type="month" class="form-control" name="date" placeholder="yyyy-MM">
+                    </div>
+                    <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="">
+                    <div class="input-group-append">
+                        <button class="btn btn-darkmode" id="button">Search</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center ml-3 mr-3">
+            <div class="pl-3 pr-3">
+                <div class="col">
+                    <span class="btn btn-sm" style="background-color: #967D7D; color: #000000;">
+                        <input type="checkbox">
+                        <a>RDY</a>
+                    </span>
+                    <span class="btn btn-sm" style="background-color: #FFFFFF; color: #565656;">
+                        <input type="checkbox">
+                        <a>FIN</a>
+                    </span>
+                </div>
+            </div>
+            <div class="p-2 ml-2 bd-highlight align-self-center">
+                <div class="col">
+                    <input type="checkbox" class="form-check-input" id="excluderndproject" name="excluderndproject" checked>
+                    <label class="form-check-label text-muted" for="excluderndproject">RND, ETC 프로젝트 제외</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto pt-4 pb-2">
+            <div class="col-lg-10">
+                <div class="d-flex bd-highlight">
+                    <div class="mr-auto bd-highlight">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </div>
+                    {{if ge .Token.AccessLevel 3}}
+                        <div class="db-highlight mr-2">
+                            <button class="btn btn-sm btn-outline-danger">Update Projects</button>
+                        </div>
+                        <div class="bd-highlight">
+                            <button class="btn btn-outline-warning btn-sm">+</button>
+                        </div>
+                    {{end}}
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto">
+            <div class="col-lg-10">
+            <table name="projecttable" id="projecttable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">Status</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">ID</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">이름</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">작업 기간</th>
+                        <th class="border-top-white border-bottom-gray border-right-white" colspan="2">컷수 정보</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">총 매출</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">진행비</th>
+                        <th class="border-top-white border-bottom-white {{if ge .Token.AccessLevel 3}} border-right-white {{end}}" rowspan="2">구매비</th>
+                        {{if ge .Token.AccessLevel 3}}
+                            <th class="border-top-white border-bottom-white" rowspan="2"></th>
+                        {{end}}
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">계약 컷수</th>
+                        <th class="border-bottom-white">작업 컷수</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td class="border-right-gray" style="background-color: #FFFFFF; color: #565656;">FIN</td>
+                        <td class="border-right-gray">MUS</td>
+                        <td class="border-right-gray">유열의 음악앨범</td>
+                        <td class="border-right-white">2020년 08월 ~ 2021년 01월</td>
+                        <td class="border-right-gray">150</td>
+                        <td class="border-right-white">200</td>
+                        <td class="border-right-white text-right">10,000,000</td>
+                        <td class="border-right-gray text-right">2,000,000</td>
+                        <td class="{{if ge .Token.AccessLevel 3}} border-right-white {{end}} text-right">300,000</td>
+                        {{if ge .Token.AccessLevel 3}}
+                            <td>
+                                <span class="finger badge badge-warning">Edit</span>
+                                {{if eq .Token.AccessLevel 4}}
+                                    <span class="finger badge badge-danger">Del</span>
+                                {{end}}
+                            </td>
+                        {{end}}
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        </div>
+
+        <div class="text-center text-darkmode">
+            <p class="h6 font-weight-light pt-3">
+                <p class="h6 font-weight-light">프로젝트를 관리할 수 있는 페이지입니다.</p>
+                <br>
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-2" style="padding-right:5px">
+                            <input type="month" class="form-control" name="date" placeholder="yyyy-MM">
+                        </div>
+                        <div class="col-4 text-left pt-2" style="padding-left:0px">
+                            : 선택한 달에 진행하고 있는 프로젝트를 검색합니다.
+                        </div>
+                    </div>
+                </p>
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-2" style="padding-right: 0px;">
+                            <input type="checkbox" class="form-check-input" id="excluderndproject" name="excluderndproject" checked>
+                            <label class="form-check-label text-muted" for="excluderndproject">RND, ETC 프로젝트 제외</label>
+                        </div>
+                        <div class="col-4 text-left pt-2" style="padding-left:0px">
+                            : RND, ETC 프로젝트를 제외해서 볼 것인지 체크하여 검색합니다.
+                        </div>
+                    </div>
+                </p>
+                <p class="h6 font-weight-light">
+                    <span class="btn btn-sm" style="background-color: #967D7D; color: #000000;">
+                        <input type="checkbox">
+                        <a>RDY</a>
+                    </span>
+                    <span class="btn btn-sm" style="background-color: #FFFFFF; color: #565656;">
+                        <input type="checkbox">
+                        <a>FIN</a>
+                    </span>
+                    : status 별로 프로젝트를 검색할 수 있습니다.
+                </p>
+                {{if eq .Token.AccessLevel 4}}
+                    <p class="h6 font-weight-light">
+                        <span class="btn btn-outline-warning btn-sm">Download</span>
+                        : 프로젝트 데이터를 엑셀 파일로 다운로드합니다.
+                    </p>
+                {{end}}
+                {{if ge .Token.AccessLevel 3}}
+                    <p class="h6 font-weight-light">
+                        <span class="btn btn-sm btn-outline-danger">Update Projects</span>
+                        : 샷건에서 프로젝트 데이터를 가져와 추가합니다.
+                    </p>
+                    <p class="h6 font-weight-light">
+                        <span class="btn btn-outline-warning btn-sm">+</span>
+                        : 프로젝트를 추가합니다.
+                    </p>
+                    <p class="h6 font-weight-light">
+                        <span class="finger badge badge-warning">Edit</span>
+                        : 프로젝트 데이터를 수정하는 페이지로 이동합니다.
+                    </p>
+                    {{if eq .Token.AccessLevel 4}}
+                        <p class="h6 font-weight-light">
+                            <span class="finger badge badge-danger">Del</span>
+                            : 프로젝트를 삭제합니다.
+                        </p>
+                    {{end}}
+                {{end}}
+            </p>
+        </div>
+    </div>
+{{end}}

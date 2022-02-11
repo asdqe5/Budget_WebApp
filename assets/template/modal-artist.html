@@ -1,0 +1,151 @@
+{{define "modal-artist"}}
+<div class="">
+    <input type="hidden" id="token" value="{{.User.Token}}">
+    <!-- Modal : Add VFX Artist -->
+    <div class="modal" id="modal-addartistvfx" tabindex="-1" role="dialog" aria-labelledby="modal-addartistvfx" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color:#2e2d2d">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-addartistvfx-title">Add Artist</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-addartistvfx-id" class="col-form-label text-white">Shotgun ID</label>
+                        <input type="number" class="form-control" id="modal-addartistvfx-id" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-addartistvfx-salary" class="col-form-label text-white">연봉</label>
+                        <input type="text" class="form-control" id="modal-addartistvfx-salary">
+                        <small class="form-text text-muted mr-2">2019:2400,2020:2400 형식으로 입력해주세요. 해당 연도의 최종 연봉을 입력해주세요.</small>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="form-group mt-3">
+                        <label for="modal-addartistvfx-startday" class="col-form-label text-white">입사일</label>
+                        <input type="date" class="form-control" id="modal-addartistvfx-startday" max="9999-12-31">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="modal-addartistvfx-endday" class="col-form-label text-white">퇴사일</label>
+                        <input type="date" class="form-control" id="modal-addartistvfx-endday" max="9999-12-31">
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="custom-control custom-checkbox pb-2 mt-3">
+                        <input type="checkbox" class="custom-control-input" id="modal-addartistvfx-change">
+                        <label class="custom-control-label text-white" for="modal-addartistvfx-change">동일 연도 연봉 변경 (변경 전 연봉 입력)</label>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col">
+                            <input type="date" class="form-control" id="modal-addartistvfx-changedate" max="9999-12-31">
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" min="0" id="modal-addartistvfx-changesalary">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-warning" onclick="addArtistVFXFunc(
+                        document.getElementById('modal-addartistvfx-id').value, document.getElementById('modal-addartistvfx-salary').value, 
+                        document.getElementById('modal-addartistvfx-startday').value, document.getElementById('modal-addartistvfx-endday').value)">
+                        Add
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal : Add CM Artist -->
+    <div class="modal" id="modal-addartistcm" tabindex="-1" role="dialog" aria-labelledby="modal-addartistcm" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color:#2e2d2d">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-addartistcm-title">Add Artist</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-addartistcm-id" class="col-form-label text-white">CM ID</label>
+                        <input type="number" class="form-control" id="modal-addartistcm-id" min="0">
+                        <small class="form-text text-muted mr-2">숫자만 입력해주세요.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-addartistcm-team" class="col-form-label text-white">Team</label>
+                        <input type="text" class="form-control" id="modal-addartistcm-team">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-addartistcm-name" class="col-form-label text-white">Name</label>
+                        <input type="text" class="form-control" id="modal-addartistcm-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-addartistcm-salary" class="col-form-label text-white">연봉</label>
+                        <input type="text" class="form-control" id="modal-addartistcm-salary">
+                        <small class="form-text text-muted mr-2">2019:2400,2020:2400 형식으로 입력해주세요.</small>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="form-group mt-3">
+                        <label for="modal-addartistcm-startday" class="col-form-label text-white">입사일</label>
+                        <input type="date" class="form-control" id="modal-addartistcm-startday" max="9999-12-31">
+                    </div>
+                    <div class="form-group mt-3">
+                        <label for="modal-addartistcm-endday" class="col-form-label text-white">퇴사일</label>
+                        <input type="date" class="form-control" id="modal-addartistcm-endday" max="9999-12-31">
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <div class="custom-control custom-checkbox pb-2 mt-3">
+                        <input type="checkbox" class="custom-control-input" id="modal-addartistcm-change">
+                        <label class="custom-control-label text-white" for="modal-addartistcm-change">동일 연도 연봉 변경 (변경 전 연봉 입력)</label>
+                    </div>
+                    <div class="row form-group">
+                        <div class="col">
+                            <input type="date" class="form-control" id="modal-addartistcm-changedate" max="9999-12-31">
+                        </div>
+                        <div class="col">
+                            <input type="number" class="form-control" min="0" id="modal-addartistcm-changesalary">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-warning" onclick="addArtistCMFunc(document.getElementById('modal-addartistcm-id').value, 
+                    document.getElementById('modal-addartistcm-team').value, document.getElementById('modal-addartistcm-name').value, document.getElementById('modal-addartistcm-salary').value,
+                    document.getElementById('modal-addartistcm-startday').value, document.getElementById('modal-addartistcm-endday').value)">Add</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal : Remove Artist -->
+    <div class="modal" id="modal-rmartist" tabindex="-1" role="dialog" aria-labelledby="modal-rmartist" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color:#2e2d2d">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-rmartist-title">Delete Artist</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-rmartist-id" class="col-form-label text-white">Shotgun/CM ID</label>
+                        <textarea class="form-control" id="modal-rmartist-id" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-rmartist-team" class="col-form-label text-white">Team</label>
+                        <textarea class="form-control" id="modal-rmartist-team" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-rmartist-name" class="col-form-label text-white">Name</label>
+                        <textarea class="form-control" id="modal-rmartist-name" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-danger" onclick="rmArtistFunc(document.getElementById('modal-rmartist-id').value)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

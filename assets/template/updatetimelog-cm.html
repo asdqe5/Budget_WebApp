@@ -1,0 +1,39 @@
+{{define "updatetimelog-cm"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container p-5">
+        <div class="col-lg-6 col-md-8 col-sm-12 mx-auto">
+            <div class="pt-3 pb-3">
+                <h2 class="text-muted text-center">Update CM Timelog</h2>
+            </div>
+            <div class="">
+                <form action="/upload-timelogcmexcel" method="post" class="dropzone" enctype="multipart/form-data">
+                    <div class="fallback">
+                        <input name="file" type="file" />
+                    </div>
+                </form>
+                <small class="form-text text-muted">업로드할 .xlsx 파일을 Drag & Drop 해주세요.</small>
+                <small class="form-text text-muted">Apple Numbers에서 작성된 파일은 인식되지 않습니다.</small>
+                <small class="form-text">
+                    <a href="/timelogcmexcel-download" class="text-warning" download>.xlsx Template 다운로드</a>
+                </small>
+                <div class="form-group pt-5">
+                    <label class="text-muted">Date</label>
+                    <input type="month" class="form-control" id="date" name="date" value="{{.Date}}" value="{{.Date}}" onchange="changeTimelogCMExcelURIFunc()">
+                </div>
+            </div>
+        </div>
+        <div class="text-center pt-5">
+            <a href="/timelogcmexcel-submit?date={{.Date}}" class="btn btn-outline-warning" id="updateTimelogCMExcelURI">NEXT</a>
+        </div>
+    </div>
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/dropzone.js"></script>
+</html>
+{{end}}

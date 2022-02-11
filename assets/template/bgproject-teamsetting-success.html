@@ -1,0 +1,28 @@
+{{define "bgproject-teamsetting-success"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    <div class="container p-5">
+        <div class="col-lg-6 col-md-6 col-sm-12 mx-auto">
+            <div class="pt-3 pb-5">
+                <h2 class="text-center section-heading text-muted">{{.ID}}_{{.BGType}}_Team Setting</h2>
+            </div>
+            <div>
+                <h4 class="text-center text-muted">
+                    팀 설정이 업데이트 되었습니다.
+                </h4>
+            </div>
+            <div class="text-center">
+                <a href="/bgproject-teamsetting?id={{.ID}}&bgtype={{.BGType}}&date={{.Date}}" class="btn btn-darkmode mt-5">Edit</a>
+                <a href="/bgprojects?date={{.Date}}" class="btn btn-darkmode mt-5">예산 프로젝트</a>
+                <a href="/" class="btn btn-darkmode mt-5">Home</a>
+            </div>
+        </div>
+    </div>
+{{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+{{end}}

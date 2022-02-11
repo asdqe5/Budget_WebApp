@@ -1,0 +1,257 @@
+{{define "init"}}
+{{template "head"}}
+<body>
+    {{template "navbar" .}}
+    {{template "modal-timelog" .}}
+    
+    <!-- 오늘이 프로젝트, 외주 업체의 세금계산서 발행일이면 팝업창이 보인다. -->
+    <div id="popupLayer" style="position: absolute; top: 10px; right: 10px; max-width: 300px; z-index: 10000;">
+        <!-- 프로젝트 매출 세금계산서 발행일 알림 -->
+        {{range $project := .ProjectsByToday}}
+            <div class="mb-2 popup" id="popup-project-{{$project.ID}}">
+                <div class="popup-header">
+                    <strong class="ml-2 mr-auto text-dark">매출 알림!</strong>
+                    <button type="button" class="mr-2 mb-1 close" aria-label="Close" onclick="document.getElementById('popup-project-{{$project.ID}}').style.display = 'none'">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div>
+                    <div class="mt-2 ml-2" style="font-size: small;">
+                        오늘은 <strong>{{$project.Name}}</strong> 프로젝트의 세금계산서 발행일입니다.
+                    </div>
+                    <div class="form-check pt-3 pb-1 pl-4">
+                        <input type="checkbox" class="form-check-input mt-2" id="popup-project-label-{{$project.ID}}" onclick="setPopupNotDisplayFunc('popup-project-{{$project.ID}}')">
+                        <label class="form-check-label" for="popup-project-label-{{$project.ID}}" style="font-size: small;">오늘하루 열지않음</label>
+                    </div>
+                </div>
+            </div>
+        {{end}}
+        <!-- 외주 업체 세금계산서 발행일 알림 -->
+        {{range $vendor := .VendorsByToday}}
+            <div class="mb-2 popup" id="popup-vendor-{{$vendor.ID.Hex}}">
+                <div class="popup-header">
+                    <strong class="ml-2 mr-auto text-dark">벤더 알림!</strong>
+                    <button type="button" class="mr-2 mb-1 close" aria-label="Close" onclick="document.getElementById('popup-vendor-{{$vendor.ID.Hex}}').style.display = 'none'">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div>
+                    <div class="mt-2 ml-2" style="font-size: small;">
+                        오늘은 <strong>{{$vendor.ProjectName}}</strong> 프로젝트의 <strong>{{$vendor.Name}}</strong> 의 세금계산서 발행일입니다.
+                    </div>
+                    <div class="form-check pt-3 pb-1 pl-4">
+                        <input type="checkbox" class="form-check-input mt-2" id="popup-vendor-label-{{$vendor.ID.Hex}}" onclick="setPopupNotDisplayFunc('popup-vendor-{{$vendor.ID.Hex}}')">
+                        <label class="form-check-label" for="popup-vendor-label-{{$vendor.ID.Hex}}" style="font-size: small;">오늘하루 열지않음</label>
+                    </div>
+                </div>
+            </div>
+        {{end}}
+    </div>
+    
+    <div class="container py-4 px-2" style="max-width: 85%;">
+        <form action="/search" method="POST">
+            <div class="row justify-content-start align-items-center mx-auto">
+                <div class="col">
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" id="finishedCheckbox1" name="finishedCheckbox1"
+                        {{if or (eq .FinishedStatus "all") (eq .FinishedStatus "ing")}} checked {{end}}
+                        {{if eq .FinishedStatus "none"}} onclick="self.location='?finishedstatus=ing'" {{end}}
+                        {{if eq .FinishedStatus "end"}} onclick="self.location='?finishedstatus=all'" {{end}}
+                        {{if eq .FinishedStatus "ing"}} onclick="self.location='?finishedstatus=none'" {{end}}
+                        {{if eq .FinishedStatus "all"}} onclick="self.location='?finishedstatus=end'" {{end}}>
+                        <label class="custom-control-label text-white" for="finishedCheckbox1">진행 중인 프로젝트</label>
+                    </div>
+                    <div class="custom-control custom-checkbox custom-control-inline">
+                        <input type="checkbox" class="custom-control-input" id="finishedCheckbox2" name="finishedCheckbox2"
+                        {{if or (eq .FinishedStatus "all") (eq .FinishedStatus "end")}} checked {{end}}
+                        {{if eq .FinishedStatus "none"}} onclick="self.location='?finishedstatus=end'" {{end}}
+                        {{if eq .FinishedStatus "end"}} onclick="self.location='?finishedstatus=none'" {{end}}
+                        {{if eq .FinishedStatus "ing"}} onclick="self.location='?finishedstatus=all'" {{end}}
+                        {{if eq .FinishedStatus "all"}} onclick="self.location='?finishedstatus=ing'" {{end}}>
+                        <label class="custom-control-label text-white" for="finishedCheckbox2">정산 완료된 프로젝트</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row justify-content-center align-items-center m-3">
+                <div class="col-lg-8">
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <select name="project" id="project" class="custom-select left-radius">
+                                <option value="" {{if eq .SelectedProjectID "" }}selected{{end}}>All</option>
+                                {{range $project := .AllProject}}
+                                    <option value="{{$project.ID}}" {{if eq $.SelectedProjectID $project.ID }}selected{{end}}>{{$project.Name}}</option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <input class="form-control" id="searchword" name="searchword" placeholder="Search word.." type="text" value="{{.SearchWord}}">
+                        <div class="input-group-append">
+                            <button class="btn btn-darkmode" id="button">Search</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center">
+                <div class="p-2 bd-highlight">
+                    <input type="hidden" id="status" name="status" value="{{.SelectedStatus}}">
+                    <div class="col">
+                        {{range $s := .Status}}
+                            <span class="btn btn-sm" onclick="setStatusCheckBoxFunc('status-checkbox-{{$s.ID}}')" style="background-color: {{$s.BGColor}}; color: {{$s.TextColor}};">
+                                <input type="checkbox" id="status-checkbox-{{$s.ID}}" value="{{$s.ID}}" {{if hasStatusFunc $.SelectedStatus $s.ID}} checked {{end}}>
+                                <a>{{$s.ID}}</a>
+                            </span>
+                        {{end}}
+                    </div>
+                </div>
+                <div class="p-2 bd-highlight">
+                    <select class="custom-select custom-select" id="revenueStatus" name="revenueStatus" style="height: 31px; font-size: 13px;">
+                        <option value="" {{if eq .RevenueStatus "" }}selected{{end}}>수익 상태</option>
+                        <option value="profit" {{if eq .RevenueStatus "profit" }}selected{{end}}>수익 난 프로젝트</option>
+                        <option value="loss" {{if eq .RevenueStatus "loss" }}selected{{end}}>손해 난 프로젝트</option>
+                    </select>
+                </div>
+                <div class="p-2 ml-2 bd-highlight align-self-center">
+                    <div class="form-check">
+                        <input type="checkbox" class="form-check-input" id="excluderndproject" name="excluderndproject" {{ if eq $.ExcludeRNDProject "true" }} checked {{end}}>
+                        <label class="form-check-label text-muted" for="excluderndproject">RND, ETC 프로젝트 제외</label>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="mx-auto pt-4 pb-2">
+            <div class="d-flex bd-highlight">
+                <div class="mr-auto bd-highlight">
+                    <form action="/exportinit" method="POST">
+                        {{if eq .Token.AccessLevel 4}}
+                            <button type="submit" class="btn btn-outline-warning btn-sm">Download</button>
+                        {{end}}
+                    </form>
+                </div>
+                <div class="bd-highlight">
+                    <label class="text-muted">[업데이트된 시간: &nbsp;{{changeDateFormatFunc .UpdatedTime}}]&nbsp;</label>
+                    <button id="updatetimelog" class="btn btn-outline-danger btn-sm" onclick="checkMonthlyStatusFunc()">Update Timelog</button>
+                </div>
+            </div>
+        </div>
+            
+        <div class="mx-auto freeze-table">
+            <table name="projecttable" id="projecttable" class="table table-sm text-center table-hover text-white">
+                <thead>
+                    <tr>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">Status</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">프로젝트</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">작업 기간</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">총 매출</th>
+                        <th class="border-top-white border-right-white border-bottom-gray" colspan="4">총 지출</th>
+                        <th class="border-top-white border-bottom-white" rowspan="2">수익</th>
+                        <th rowspan="2" style="border-style:hidden; width:20px; background-color:#2e2d2d"></th> <!-- 비용과 수익 사이에 여백을 줌 -->
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">내부 비용</th>
+                        <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">외주비</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">공통노무비 외</th>
+                        <th class="border-top-white border-bottom-white border-right-white" rowspan="2">수익</th>
+                        <th class="border-top-white border-bottom-white" rowspan="2"></th>
+                    </tr>
+                    <tr>
+                        <th class="border-bottom-white border-right-gray">내부 비용</th>
+                        <th class="border-bottom-white border-right-gray">외주비</th>
+                        <th class="border-bottom-white border-right-gray">공통노무비 외</th>
+                        <th class="border-bottom-white">합계</th>
+                    </tr>
+                </thead>
+    
+                <tbody>
+                    {{range $projectInfo := .Projects}}
+                        <tr>
+                            {{$s := ""}}
+                            {{if eq $projectInfo.Project.IsFinished true}}
+                                {{$s = getLastStatusOfProjectFunc $projectInfo.Project}} <!-- 정산 완료된 프로젝트인 경우 마지막 Status -->
+                            {{else}}
+                                {{$s = getThisMonthStatusOfProjectFunc $projectInfo.Project}} <!-- 정산 완료되지 않은 프로젝트인 경우 이번 달의 Status -->
+                            {{end}}
+                            {{$ps := getStatusFunc $.Status $s}}
+                            <!-- 프로젝트의 마지막 상태 -->
+                            <td class="border-right-gray border-top-gray" style="background-color: {{$ps.BGColor}}; color: {{$ps.TextColor}};">
+                                {{$ps.ID}}
+                            </td>
+                            <!-- 프로젝트 이름 -->
+                            <td class="border-right-gray border-top-gray">
+                                {{$projectInfo.Project.Name}}
+                            </td>     
+                            <!-- 작업 기간 -->
+                            <td class="border-right-white border-top-gray">
+                                {{stringToDateFunc $projectInfo.Project.StartDate}} ~ {{stringToDateFunc $projectInfo.Project.SMEndDate}}
+                            </td>
+                            <!-- 총 매출 --> 
+                            <td class="text-right border-right-white border-top-gray">
+                                {{decryptPaymentFunc $projectInfo.Project.Payment true}}
+                            </td>
+                            <!-- 총 지출 - 내부 비용 -->
+                            <td class="border-top-gray border-right-gray text-right">
+                                {{decryptCostFunc $projectInfo.Project.TotalAmount true}}
+                            </td>
+                            <!-- 총 지출 - 외주비 -->
+                            <td class="border-top-gray border-right-gray text-right">
+                                {{decryptCostFunc $projectInfo.Vendor true}}
+                            </td>
+                            <!-- 총 지출 - 경영관리실 -->
+                            <td class="border-top-gray border-right-gray text-right">
+                                {{decryptCostFunc $projectInfo.Project.SMDifference true}}
+                            </td>
+                            <!-- 합계 -->
+                            <td class="border-top-gray border-right-white text-right">
+                                {{decryptCostFunc $projectInfo.TotalExpenditure true}}
+                            </td>
+                            <!-- 수익 -->
+                            <td class="border-top-gray text-right font-weight-bold {{getColorOfRevenueFunc $projectInfo.Revenue}}">
+                                {{decryptCostFunc $projectInfo.Revenue true}}
+                            </td>
+                            <td style="border-style:hidden; width:20px; background-color:#2e2d2d"></td> <!-- 비용과 수익 사이에 여백을 줌 -->
+                            <!-- 내부 비용 비율 -->
+                            <td class="border-top-gray border-right-gray">
+                                {{calRatioFunc $projectInfo.Project.TotalAmount $projectInfo.Project.Payment}} %
+                            </td>
+                            <!-- 외주비 비율 -->
+                            <td class="border-top-gray border-right-gray">
+                                {{calRatioFunc $projectInfo.Vendor $projectInfo.Project.Payment}} %
+                            </td>
+                            <!-- 경영관리실 비율 -->
+                            <td class="border-top-gray border-right-white">
+                                {{calRatioFunc $projectInfo.Project.SMDifference $projectInfo.Project.Payment}} %
+                            </td>
+                            <!-- 수익 비율 -->
+                            <td class="border-right-white border-top-gray font-weight-bold {{getColorOfRevenueFunc $projectInfo.Revenue}}">
+                                {{calRatioFunc $projectInfo.Revenue $projectInfo.Project.Payment}} %
+                            </td>
+                            <td class="border-top-gray">
+                                <a class="finger badge badge-info" href="/detail-sm?id={{$projectInfo.Project.ID}}">Detail</a>
+                            </td>
+                        </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {{template "footer"}}
+</body>
+<!--add javascript-->
+<script src="/assets/js/jquery-3.1.1.min.js"></script>
+<script src="/assets/bootstrap-4/js/bootstrap.bundle.min.js"></script>
+<script src="/assets/js/budget.js"></script>
+<script src="/assets/js/freeze-table.min.js"></script>
+
+<script>
+    $(document).ready(function(){
+        $(".freeze-table").freezeTable({
+            "headWrapStyles": {
+                "top": "56px", /* navbar 밑에 고정되도록 */
+                "box-shadow": "0px 9px 10px -5px rgb(45, 45, 45)"
+            },
+            "freezeColumn": false, /* column 고정 해제 */
+            "backgroundColor": false, /* false로 하면 기존 컬러로 설정됨 */
+        })
+    })
+</script>
+
+</html>
+{{end}}

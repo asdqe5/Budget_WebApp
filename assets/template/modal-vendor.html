@@ -1,0 +1,37 @@
+{{define "modal-vendor"}}
+<div class="">
+    <input type="hidden" id="token" value="{{.User.Token}}">
+    <!-- Modal: Remove Vendor -->
+    <div class="modal" id="modal-rmvendor" tabindex="-1" role="dialog" aria-labelledby="modal-rmvendor" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content bg-darkmode" style="background-color:#2e2d2d">
+                <div class="modal-header">
+                    <h5 class="modal-title text-white" id="modal-rmvendor-title">Delete Vendor</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true" class="text-darkmode">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="modal-rmvendor-id" class="col-form-label text-white">ID</label>
+                        <textarea class="form-control" id="modal-rmvendor-id" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-rmvendor-project" class="col-form-label text-white">Project</label>
+                        <textarea class="form-control" id="modal-rmvendor-project" disabled></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="modal-rmvendor-name" class="col-form-label text-white">Name</label>
+                        <textarea class="form-control" id="modal-rmvendor-name" disabled></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-darkmode" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-danger" onclick="rmVendorFunc(document.getElementById('modal-rmvendor-id').value, 
+                    document.getElementById('modal-rmvendor-project').value, document.getElementById('modal-rmvendor-name').value)">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

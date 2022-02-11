@@ -1,0 +1,143 @@
+{{define "help-smdetaillaborcost"}}
+    <!-- 세부 인건비 Help -->
+    <div class="p-5">
+        <h3 class="pt-5 pb-4 text-darkmode text-center">세부 인건비</h3>
+        <div class="row justify-content-center align-items-center m-3">
+            <div class="col-lg-10">
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input" checked>
+                    <label class="custom-control-label text-muted">VFX</label>
+                </div>
+                <div class="custom-control custom-radio custom-control-inline">
+                    <input type="radio" class="custom-control-input">
+                    <label class="custom-control-label text-muted">CM</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto pt-4 pb-2">
+            <div class="col-lg-10">
+                <div class="d-flex bd-highlight">
+                    <div class="mr-auto bd-highlight">
+                        <button class="btn btn-outline-warning btn-sm">Download</button>
+                    </div>
+                    <div class="bd-highlight">
+                        <input class="form-control" type="month" format="yyyy-MM" placeholder="yyyy-MM" value="2021-01">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row justify-content-center align-items-center mx-auto">
+            <div class="col-lg-10">
+                <table name="smdetaillaborcosttable" id="smdetaillaborcosttable" class="table table-sm text-center table-hover text-white">
+                    <thead>
+                        <tr>
+                            <th class="border-top-white border-bottom-white border-right-gray" rowspan="2">ID</th>
+                            <th class="border-top-white border-bottom-white border-right-white" rowspan="2">이름</th>
+                            <th class="border-top-white border-bottom-gray border-right-white" colspan="5">프로젝트</th>
+                            <th class="border-top-white border-bottom-white total" rowspan="2">Total</th>
+                        </tr>
+                        <tr>
+                            <th class="border-bottom-white border-right-gray">BEE</th>
+                            <th class="border-bottom-white border-right-gray">COM</th>
+                            <th class="border-bottom-white border-right-gray">CHU</th>
+                            <th class="border-bottom-white border-right-gray">JSG</th>
+                            <th class="border-bottom-white">MUS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="border-right-gray">90</td>
+                            <td class="border-right-white">심애림</td>
+                            <td class="border-right-gray text-right">0</td>
+                            <td class="border-right-gray text-right">1,037,604</td>
+                            <td class="border-right-gray text-right">0</td>
+                            <td class="border-right-gray text-right">218,663</td>
+                            <td class="border-right-white text-right">743,733</td>
+                            <td class="total text-right">2,000,000</td>
+                        </tr>
+                        <tr>
+                            <td class="border-top-white border-right-white total" colspan="2">Total</td>
+                            <td class="border-top-white border-right-gray total text-right">0</td>
+                            <td class="border-top-white border-right-gray total text-right">1,037,604</td>
+                            <td class="border-top-white border-right-gray total text-right">0</td>
+                            <td class="border-top-white border-right-gray total text-right">218,663</td>
+                            <td class="border-top-white border-right-white total text-right">743,733</td>
+                            <td class="border-top-white total text-right">2,000,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="text-center text-darkmode">
+            <p class="h6 font-weight-light pt-2">
+                <p class="h6 font-weight-light">아티스트들의 프로젝트별 세부 인건비를 확인할 수 있는 페이지입니다.</p>
+                <br>
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-2 text-right" style="padding-right:0px">
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input" checked>
+                                <label class="custom-control-label text-muted">VFX</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" class="custom-control-input">
+                                <label class="custom-control-label text-muted">CM</label>
+                            </div>
+                        </div>
+                        <div class="col-4 text-left" style="padding-left:0px">
+                            : VFX 본부, CM 본부별로 확인할 수 있습니다.
+                        </div>
+                    </div>
+                </p>
+                <p class="h6 font-weight-light"><span class="btn btn-outline-warning btn-sm">Download</span>
+                : 세부 인건비 데이터를 엑셀 파일로 다운로드합니다.
+                </p>
+                <p class="h6 font-weight-light">
+                    <div class="row justify-content-center">
+                        <div class="col-2" style="padding-right:5px">
+                            <input class="form-control" type="month" format="yyyy-MM" placeholder="yyyy-MM" value="2021-01">
+                        </div>
+                        <div class="col-4 text-left pt-2" style="padding-left:0px">
+                            : 선택한 달의 아티스트들의 세부 인건비를 확인할 수 있습니다.
+                        </div>
+                    </div>
+                </p>
+                <!-- 모달창 목록 -->
+                <h5 class="pt-5 text-darkmode text-left"><모달창 목록></h5>
+                <div class="border p-3" style="border-color: #f7f7f97c !important;">
+                    <div class="row">
+                        <div class="col-3">
+                            <div class="nav flex-column nav-pills" id="errortab" role="tablist" aria-orientation="vertical">
+                                <a class="nav-link font-weight-bold active" data-toggle="pill" href="#noneartists" role="tab" aria-controls="noneartists" aria-selected="true">None Artists Error</a>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="tab-content">
+                                <!-- None Artists Error -->
+                                <div class="tab-pane fade show active" id="noneartists" role="tabpanel" aria-labelledby="noneartists-tab">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <img src="/assets/img/noneartists.png" alt="noneartists">
+                                        </div>
+                                        <div class="col">
+                                            <p class="font-weight-bold pb-3">
+                                                등록되지 않은 아티스트가 있는 경우 발생하는 에러
+                                            </p>
+                                            <p class="h6 font-weight-light">
+                                                <span class="btn btn-outline-warning">Add Artists</span>
+                                                : 아티스트를 추가하는 페이지로 이동합니다.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </p>
+        </div>
+    </div>
+{{end}}
